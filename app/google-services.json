@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "168118520777",
+    "project_id": "birdnest-75980",
+    "storage_bucket": "birdnest-75980.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:168118520777:android:97aa43b7c6c1001677b618",
+        "android_client_info": {
+          "package_name": "com.example.boardingbookingapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2v-dbS-zugAAbqaMBq5vLSltwbkKuKXM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
