@@ -1,8 +1,8 @@
-package com.example.birdnest.domain.usecase.roommate
+package com.example.boardingbookingapp.domain.usecase.roommate
 
-import com.example.birdnest.data.model.RoommateProfile
-import com.example.birdnest.data.model.StudyHabit
-import com.example.birdnest.data.model.SleepPattern
+import com.example.boardingbookingapp.data.model.RoommateProfile
+import com.example.boardingbookingapp.data.model.StudyHabit
+import com.example.boardingbookingapp.data.model.SleepPattern
 
 // Sprint 4 — pure scoring function, no injection needed
 class GetRoommateMatchesUseCase {

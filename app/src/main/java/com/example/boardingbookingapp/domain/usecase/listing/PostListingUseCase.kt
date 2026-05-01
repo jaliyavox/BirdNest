@@ -1,8 +1,8 @@
-package com.example.birdnest.domain.usecase.listing
+package com.example.boardingbookingapp.domain.usecase.listing
 
-import com.example.birdnest.data.model.Listing
-import com.example.birdnest.data.repository.ListingRepository
-import com.example.birdnest.util.Result
+import com.example.boardingbookingapp.data.model.Listing
+import com.example.boardingbookingapp.data.repository.ListingRepository
+import com.example.boardingbookingapp.util.Result
 
 // Sprint 3 — inject via Hilt
 class PostListingUseCase(private val listingRepository: ListingRepository) {

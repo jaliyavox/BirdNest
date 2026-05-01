@@ -1,4 +1,4 @@
-package com.example.birdnest.ui.theme
+package com.example.boardingbookingapp.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme

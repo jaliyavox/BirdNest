@@ -1,4 +1,4 @@
-package com.example.birdnest.util
+package com.example.boardingbookingapp.util
 
 import java.text.NumberFormat
 import java.util.Locale

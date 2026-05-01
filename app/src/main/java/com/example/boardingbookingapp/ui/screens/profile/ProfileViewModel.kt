@@ -1,8 +1,8 @@
-package com.example.birdnest.ui.screens.profile
+package com.example.boardingbookingapp.ui.screens.profile
 
 import androidx.lifecycle.ViewModel
-import com.example.birdnest.data.model.Listing
-import com.example.birdnest.data.model.User
+import com.example.boardingbookingapp.data.model.Listing
+import com.example.boardingbookingapp.data.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

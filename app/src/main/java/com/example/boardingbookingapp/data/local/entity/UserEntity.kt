@@ -1,4 +1,4 @@
-package com.example.birdnest.data.local.entity
+package com.example.boardingbookingapp.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

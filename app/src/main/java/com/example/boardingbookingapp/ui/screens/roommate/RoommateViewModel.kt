@@ -1,7 +1,7 @@
-package com.example.birdnest.ui.screens.roommate
+package com.example.boardingbookingapp.ui.screens.roommate
 
 import androidx.lifecycle.ViewModel
-import com.example.birdnest.data.model.RoommateProfile
+import com.example.boardingbookingapp.data.model.RoommateProfile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

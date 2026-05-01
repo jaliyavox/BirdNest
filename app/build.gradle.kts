@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.birdnest"
+    namespace = "com.example.boardingbookingapp"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -15,7 +15,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.birdnest"
+        applicationId = "com.example.boardingbookingapp"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

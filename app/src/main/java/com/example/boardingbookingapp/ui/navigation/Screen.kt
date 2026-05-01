@@ -1,4 +1,4 @@
-package com.example.birdnest.ui.navigation
+package com.example.boardingbookingapp.ui.navigation
 
 sealed class Screen(val route: String) {
     data object Splash          : Screen("splash")

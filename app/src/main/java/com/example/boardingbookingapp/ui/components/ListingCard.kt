@@ -1,4 +1,4 @@
-package com.example.birdnest.ui.components
+package com.example.boardingbookingapp.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,10 +17,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.birdnest.data.model.Listing
-import com.example.birdnest.ui.theme.*
-import com.example.birdnest.util.formatCurrency
-import com.example.birdnest.util.formatDistance
+import com.example.boardingbookingapp.data.model.Listing
+import com.example.boardingbookingapp.ui.theme.*
+import com.example.boardingbookingapp.util.formatCurrency
+import com.example.boardingbookingapp.util.formatDistance
 
 @Composable
 fun ListingCard(

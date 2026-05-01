@@ -1,4 +1,4 @@
-package com.example.birdnest.ui.screens.auth
+package com.example.boardingbookingapp.ui.screens.auth
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
@@ -49,14 +49,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.birdnest.ui.components.ModernBackground
-import com.example.birdnest.ui.components.ModernButton
-import com.example.birdnest.ui.components.ModernCard
-import com.example.birdnest.ui.theme.ModernBlueSoft
-import com.example.birdnest.ui.theme.ModernPrimary
-import com.example.birdnest.ui.theme.ModernTextPrimary
-import com.example.birdnest.ui.theme.ModernTextSecondary
-import com.example.birdnest.ui.theme.ModernTextTertiary
+import com.example.boardingbookingapp.ui.components.ModernBackground
+import com.example.boardingbookingapp.ui.components.ModernButton
+import com.example.boardingbookingapp.ui.components.ModernCard
+import com.example.boardingbookingapp.ui.theme.ModernBlueSoft
+import com.example.boardingbookingapp.ui.theme.ModernPrimary
+import com.example.boardingbookingapp.ui.theme.ModernTextPrimary
+import com.example.boardingbookingapp.ui.theme.ModernTextSecondary
+import com.example.boardingbookingapp.ui.theme.ModernTextTertiary
 import kotlinx.coroutines.delay
 
 @Composable

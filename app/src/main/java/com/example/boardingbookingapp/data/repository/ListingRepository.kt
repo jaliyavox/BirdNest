@@ -1,8 +1,8 @@
-package com.example.birdnest.data.repository
+package com.example.boardingbookingapp.data.repository
 
-import com.example.birdnest.data.model.Listing
-import com.example.birdnest.data.model.Review
-import com.example.birdnest.util.Result
+import com.example.boardingbookingapp.data.model.Listing
+import com.example.boardingbookingapp.data.model.Review
+import com.example.boardingbookingapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 // Sprint 2 — implement with Firestore + Room cache

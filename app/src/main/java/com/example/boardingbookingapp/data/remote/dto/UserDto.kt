@@ -1,7 +1,7 @@
-package com.example.birdnest.data.remote.dto
+package com.example.boardingbookingapp.data.remote.dto
 
-import com.example.birdnest.data.model.User
-import com.example.birdnest.data.model.UserRole
+import com.example.boardingbookingapp.data.model.User
+import com.example.boardingbookingapp.data.model.UserRole
 
 data class UserDto(
     val id: String = "",

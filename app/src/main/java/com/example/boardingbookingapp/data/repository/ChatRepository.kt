@@ -1,8 +1,8 @@
-package com.example.birdnest.data.repository
+package com.example.boardingbookingapp.data.repository
 
-import com.example.birdnest.data.model.ChatMessage
-import com.example.birdnest.data.model.Conversation
-import com.example.birdnest.util.Result
+import com.example.boardingbookingapp.data.model.ChatMessage
+import com.example.boardingbookingapp.data.model.Conversation
+import com.example.boardingbookingapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 // Sprint 5 — implement with Firestore realtime snapshots

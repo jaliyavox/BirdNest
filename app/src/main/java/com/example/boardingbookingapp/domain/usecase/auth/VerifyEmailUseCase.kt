@@ -1,6 +1,6 @@
-package com.example.birdnest.domain.usecase.auth
+package com.example.boardingbookingapp.domain.usecase.auth
 
-import com.example.birdnest.data.repository.AuthRepository
+import com.example.boardingbookingapp.data.repository.AuthRepository
 
 // Sprint 1 — inject via Hilt
 class VerifyEmailUseCase(private val authRepository: AuthRepository) {

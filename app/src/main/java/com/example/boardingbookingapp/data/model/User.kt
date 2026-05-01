@@ -1,4 +1,4 @@
-package com.example.birdnest.data.model
+package com.example.boardingbookingapp.data.model
 
 data class User(
     val id: String = "",

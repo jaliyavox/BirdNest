@@ -1,4 +1,4 @@
-package com.example.birdnest
+package com.example.boardingbookingapp
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -16,10 +16,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.birdnest.ui.components.BottomNavBar
-import com.example.birdnest.ui.navigation.NavGraph
-import com.example.birdnest.ui.navigation.Screen
-import com.example.birdnest.ui.theme.BirdNestTheme
+import com.example.boardingbookingapp.ui.components.BottomNavBar
+import com.example.boardingbookingapp.ui.navigation.NavGraph
+import com.example.boardingbookingapp.ui.navigation.Screen
+import com.example.boardingbookingapp.ui.theme.BirdNestTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

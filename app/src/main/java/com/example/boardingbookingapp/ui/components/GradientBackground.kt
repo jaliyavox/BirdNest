@@ -1,4 +1,4 @@
-package com.example.birdnest.ui.components
+package com.example.boardingbookingapp.ui.components
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
@@ -16,9 +16,9 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import com.example.birdnest.ui.theme.BackgroundDeep
-import com.example.birdnest.ui.theme.OrbCyan
-import com.example.birdnest.ui.theme.OrbViolet
+import com.example.boardingbookingapp.ui.theme.BackgroundDeep
+import com.example.boardingbookingapp.ui.theme.OrbCyan
+import com.example.boardingbookingapp.ui.theme.OrbViolet
 
 @Composable
 fun GradientBackground(

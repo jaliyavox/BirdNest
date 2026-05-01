@@ -1,4 +1,4 @@
-package com.example.birdnest.ui.screens.auth
+package com.example.boardingbookingapp.ui.screens.auth
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,16 +44,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.birdnest.ui.components.GlassButton
-import com.example.birdnest.ui.components.GlassCard
-import com.example.birdnest.ui.components.GlassOutlineButton
-import com.example.birdnest.ui.components.GlassTextField
-import com.example.birdnest.ui.components.GradientBackground
-import com.example.birdnest.ui.theme.CyanAccent
-import com.example.birdnest.ui.theme.ErrorRed
-import com.example.birdnest.ui.theme.TextSecondary
-import com.example.birdnest.ui.theme.TextTertiary
-import com.example.birdnest.ui.theme.VioletLight
+import com.example.boardingbookingapp.ui.components.GlassButton
+import com.example.boardingbookingapp.ui.components.GlassCard
+import com.example.boardingbookingapp.ui.components.GlassOutlineButton
+import com.example.boardingbookingapp.ui.components.GlassTextField
+import com.example.boardingbookingapp.ui.components.GradientBackground
+import com.example.boardingbookingapp.ui.theme.CyanAccent
+import com.example.boardingbookingapp.ui.theme.ErrorRed
+import com.example.boardingbookingapp.ui.theme.TextSecondary
+import com.example.boardingbookingapp.ui.theme.TextTertiary
+import com.example.boardingbookingapp.ui.theme.VioletLight
 
 @Composable
 fun OwnerLoginScreen(

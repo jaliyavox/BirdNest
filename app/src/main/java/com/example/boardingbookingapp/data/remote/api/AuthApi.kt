@@ -1,6 +1,6 @@
-package com.example.birdnest.data.remote.api
+package com.example.boardingbookingapp.data.remote.api
 
-import com.example.birdnest.data.remote.dto.UserDto
+import com.example.boardingbookingapp.data.remote.dto.UserDto
 
 // Sprint 1 — add Retrofit @GET/@POST annotations after adding Retrofit dependency
 interface AuthApi {

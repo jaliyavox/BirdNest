@@ -1,7 +1,7 @@
-package com.example.birdnest.domain.usecase.listing
+package com.example.boardingbookingapp.domain.usecase.listing
 
-import com.example.birdnest.data.model.Listing
-import com.example.birdnest.data.repository.ListingRepository
+import com.example.boardingbookingapp.data.model.Listing
+import com.example.boardingbookingapp.data.repository.ListingRepository
 import kotlinx.coroutines.flow.Flow
 
 // Sprint 2 — inject via Hilt

@@ -1,11 +1,11 @@
-package com.example.birdnest.ui.screens.auth
+package com.example.boardingbookingapp.ui.screens.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.birdnest.data.model.User
-import com.example.birdnest.data.model.UserRole
-import com.example.birdnest.data.auth.UserSession
-import com.example.birdnest.data.repository.AuthRepository
+import com.example.boardingbookingapp.data.model.User
+import com.example.boardingbookingapp.data.model.UserRole
+import com.example.boardingbookingapp.data.auth.UserSession
+import com.example.boardingbookingapp.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,8 +33,9 @@ class AuthViewModel @Inject constructor(
         _state.value = AuthState.Loading
         viewModelScope.launch {
             when (val result = authRepository.sendOtp(email)) {
-                is com.example.birdnest.util.Result.Success -> _state.value = AuthState.OtpSent
-                is com.example.birdnest.util.Result.Error   -> _state.value = AuthState.Error(result.message)
+                is com.example.boardingbookingapp.util.Result.Success -> _state.value = AuthState.OtpSent
+                is com.example.boardingbookingapp.util.Result.Error   -> _state.value = AuthState.Error(result.message)
+                else -> {}
             }
         }
     }
@@ -47,11 +48,12 @@ class AuthViewModel @Inject constructor(
         _state.value = AuthState.Loading
         viewModelScope.launch {
             when (val result = authRepository.verifyOtp(_pendingEmail.value, otp)) {
-                is com.example.birdnest.util.Result.Success -> {
+                is com.example.boardingbookingapp.util.Result.Success -> {
                     UserSession.signIn(result.data)
                     _state.value = AuthState.NeedsProfile
                 }
-                is com.example.birdnest.util.Result.Error -> _state.value = AuthState.Error(result.message)
+                is com.example.boardingbookingapp.util.Result.Error -> _state.value = AuthState.Error(result.message)
+                else -> {}
             }
         }
     }
@@ -66,11 +68,12 @@ class AuthViewModel @Inject constructor(
             val user = UserSession.currentUser.value?.copy(displayName = displayName)
                 ?: return@launch
             when (val result = authRepository.createProfile(user)) {
-                is com.example.birdnest.util.Result.Success -> {
+                is com.example.boardingbookingapp.util.Result.Success -> {
                     UserSession.signIn(result.data)
                     _state.value = AuthState.Authenticated(result.data)
                 }
-                is com.example.birdnest.util.Result.Error -> _state.value = AuthState.Error(result.message)
+                is com.example.boardingbookingapp.util.Result.Error -> _state.value = AuthState.Error(result.message)
+                else -> {}
             }
         }
     }
@@ -83,11 +86,12 @@ class AuthViewModel @Inject constructor(
         _state.value = AuthState.Loading
         viewModelScope.launch {
             when (val result = authRepository.signInWithEmail(email, password)) {
-                is com.example.birdnest.util.Result.Success -> {
+                is com.example.boardingbookingapp.util.Result.Success -> {
                     UserSession.signIn(result.data)
                     _state.value = AuthState.Authenticated(result.data)
                 }
-                is com.example.birdnest.util.Result.Error -> _state.value = AuthState.Error(result.message)
+                is com.example.boardingbookingapp.util.Result.Error -> _state.value = AuthState.Error(result.message)
+                else -> {}
             }
         }
     }
@@ -101,13 +105,14 @@ class AuthViewModel @Inject constructor(
         _pendingEmail.value = email
         viewModelScope.launch {
             when (val result = authRepository.registerOwner(email, password)) {
-                is com.example.birdnest.util.Result.Success -> {
+                is com.example.boardingbookingapp.util.Result.Success -> {
                     val user = result.data.copy(displayName = name, phone = phone)
                     authRepository.createProfile(user)
                     UserSession.signIn(user)
                     _state.value = AuthState.NeedsKyc
                 }
-                is com.example.birdnest.util.Result.Error -> _state.value = AuthState.Error(result.message)
+                is com.example.boardingbookingapp.util.Result.Error -> _state.value = AuthState.Error(result.message)
+                else -> {}
             }
         }
     }
@@ -117,8 +122,9 @@ class AuthViewModel @Inject constructor(
         _state.value = AuthState.Loading
         viewModelScope.launch {
             when (val result = authRepository.submitKyc(uid, "", "")) {
-                is com.example.birdnest.util.Result.Success -> _state.value = AuthState.KycPending
-                is com.example.birdnest.util.Result.Error   -> _state.value = AuthState.Error(result.message)
+                is com.example.boardingbookingapp.util.Result.Success -> _state.value = AuthState.KycPending
+                is com.example.boardingbookingapp.util.Result.Error   -> _state.value = AuthState.Error(result.message)
+                else -> {}
             }
         }
     }

@@ -1,11 +1,11 @@
-package com.example.birdnest.di
+package com.example.boardingbookingapp.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.birdnest.data.local.AppDatabase
-import com.example.birdnest.data.local.dao.ChatDao
-import com.example.birdnest.data.local.dao.ListingDao
-import com.example.birdnest.data.local.dao.UserDao
+import com.example.boardingbookingapp.data.local.AppDatabase
+import com.example.boardingbookingapp.data.local.dao.ChatDao
+import com.example.boardingbookingapp.data.local.dao.ListingDao
+import com.example.boardingbookingapp.data.local.dao.UserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

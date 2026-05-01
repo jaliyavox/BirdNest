@@ -1,8 +1,8 @@
-package com.example.birdnest.ui.screens.payment
+package com.example.boardingbookingapp.ui.screens.payment
 
 import androidx.lifecycle.ViewModel
-import com.example.birdnest.data.model.Payment
-import com.example.birdnest.data.model.SplitBill
+import com.example.boardingbookingapp.data.model.Payment
+import com.example.boardingbookingapp.data.model.SplitBill
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

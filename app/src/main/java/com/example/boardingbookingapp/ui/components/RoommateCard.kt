@@ -1,4 +1,4 @@
-package com.example.birdnest.ui.components
+package com.example.boardingbookingapp.ui.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.birdnest.data.model.RoommateProfile
+import com.example.boardingbookingapp.data.model.RoommateProfile
 
 // Sprint 4 — add swipe gestures, match % ring chart, Coil avatar
 @Composable

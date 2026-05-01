@@ -1,4 +1,4 @@
-package com.example.birdnest.ui.navigation
+package com.example.boardingbookingapp.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -7,34 +7,34 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.birdnest.ui.screens.admin.AdminDashboardScreen
-import com.example.birdnest.ui.screens.auth.KycPendingScreen
-import com.example.birdnest.ui.screens.auth.KycUploadScreen
-import com.example.birdnest.ui.screens.auth.LoginScreen
-import com.example.birdnest.ui.screens.auth.OtpVerifyScreen
-import com.example.birdnest.ui.screens.auth.OwnerLoginScreen
-import com.example.birdnest.ui.screens.auth.OwnerRegisterScreen
-import com.example.birdnest.ui.screens.auth.RegisterScreen
-import com.example.birdnest.ui.screens.chat.ChatScreen
-import com.example.birdnest.ui.screens.chat.ConversationsScreen
-import com.example.birdnest.ui.screens.home.HomeScreen
-import com.example.birdnest.ui.screens.listings.ListingDetailScreen
-import com.example.birdnest.ui.screens.listings.ListingsScreen
-import com.example.birdnest.ui.screens.listings.PostListingScreen
-import com.example.birdnest.ui.screens.onboarding.OnboardingScreen
-import com.example.birdnest.ui.screens.payment.ReceiptUploadScreen
-import com.example.birdnest.ui.screens.payment.RentTrackerScreen
-import com.example.birdnest.ui.screens.profile.ProfileScreen
-import com.example.birdnest.ui.screens.profile.SubmitFeedbackScreen
-import com.example.birdnest.ui.screens.profile.SubmitTicketScreen
-import com.example.birdnest.ui.screens.roommate.RoommateFinderScreen
-import com.example.birdnest.ui.screens.roommate.RoommateProfileScreen
-import com.example.birdnest.ui.screens.splash.SplashScreen
+import com.example.boardingbookingapp.ui.screens.admin.AdminDashboardScreen
+import com.example.boardingbookingapp.ui.screens.auth.KycPendingScreen
+import com.example.boardingbookingapp.ui.screens.auth.KycUploadScreen
+import com.example.boardingbookingapp.ui.screens.auth.LoginScreen
+import com.example.boardingbookingapp.ui.screens.auth.OtpVerifyScreen
+import com.example.boardingbookingapp.ui.screens.auth.OwnerLoginScreen
+import com.example.boardingbookingapp.ui.screens.auth.OwnerRegisterScreen
+import com.example.boardingbookingapp.ui.screens.auth.RegisterScreen
+import com.example.boardingbookingapp.ui.screens.chat.ChatScreen
+import com.example.boardingbookingapp.ui.screens.chat.ConversationsScreen
+import com.example.boardingbookingapp.ui.screens.home.HomeScreen
+import com.example.boardingbookingapp.ui.screens.listings.ListingDetailScreen
+import com.example.boardingbookingapp.ui.screens.listings.ListingsScreen
+import com.example.boardingbookingapp.ui.screens.listings.PostListingScreen
+import com.example.boardingbookingapp.ui.screens.onboarding.OnboardingScreen
+import com.example.boardingbookingapp.ui.screens.payment.ReceiptUploadScreen
+import com.example.boardingbookingapp.ui.screens.payment.RentTrackerScreen
+import com.example.boardingbookingapp.ui.screens.profile.ProfileScreen
+import com.example.boardingbookingapp.ui.screens.profile.SubmitFeedbackScreen
+import com.example.boardingbookingapp.ui.screens.profile.SubmitTicketScreen
+import com.example.boardingbookingapp.ui.screens.roommate.RoommateFinderScreen
+import com.example.boardingbookingapp.ui.screens.roommate.RoommateProfileScreen
+import com.example.boardingbookingapp.ui.screens.splash.SplashScreen
 
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.example.birdnest.data.auth.UserSession
-import com.example.birdnest.data.model.UserRole
+import com.example.boardingbookingapp.data.auth.UserSession
+import com.example.boardingbookingapp.data.model.UserRole
 
 @Composable
 fun NavGraph(

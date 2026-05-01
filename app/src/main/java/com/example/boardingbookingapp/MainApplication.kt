@@ -1,4 +1,4 @@
-package com.example.birdnest
+package com.example.boardingbookingapp
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

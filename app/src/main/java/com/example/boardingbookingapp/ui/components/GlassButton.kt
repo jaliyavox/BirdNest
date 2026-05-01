@@ -1,4 +1,4 @@
-package com.example.birdnest.ui.components
+package com.example.boardingbookingapp.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,8 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.birdnest.ui.theme.CyanAccent
-import com.example.birdnest.ui.theme.VioletPrimary
+import com.example.boardingbookingapp.ui.theme.CyanAccent
+import com.example.boardingbookingapp.ui.theme.VioletPrimary
 
 private val ButtonGradient = Brush.horizontalGradient(
     colors = listOf(VioletPrimary, Color(0xFF5E35B1), CyanAccent.copy(alpha = 0.85f)),

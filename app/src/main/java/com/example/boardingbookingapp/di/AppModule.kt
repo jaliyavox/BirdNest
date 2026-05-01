@@ -1,4 +1,4 @@
-package com.example.birdnest.di
+package com.example.boardingbookingapp.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore

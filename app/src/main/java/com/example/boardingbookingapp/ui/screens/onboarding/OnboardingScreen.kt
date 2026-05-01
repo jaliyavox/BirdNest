@@ -1,4 +1,4 @@
-package com.example.birdnest.ui.screens.onboarding
+package com.example.boardingbookingapp.ui.screens.onboarding
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -36,11 +36,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.birdnest.ui.components.ModernBackground
-import com.example.birdnest.ui.components.ModernButton
-import com.example.birdnest.ui.theme.ModernPrimary
-import com.example.birdnest.ui.theme.ModernTextPrimary
-import com.example.birdnest.ui.theme.ModernTextSecondary
+import com.example.boardingbookingapp.ui.components.ModernBackground
+import com.example.boardingbookingapp.ui.components.ModernButton
+import com.example.boardingbookingapp.ui.theme.ModernPrimary
+import com.example.boardingbookingapp.ui.theme.ModernTextPrimary
+import com.example.boardingbookingapp.ui.theme.ModernTextSecondary
 import kotlinx.coroutines.launch
 
 data class OnboardingPage(

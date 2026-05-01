@@ -1,4 +1,4 @@
-package com.example.birdnest.ui.screens.roommate
+package com.example.boardingbookingapp.ui.screens.roommate
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,11 +24,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.birdnest.data.model.RoommateProfile
-import com.example.birdnest.data.model.StudyHabit
-import com.example.birdnest.data.model.SleepPattern
-import com.example.birdnest.ui.components.*
-import com.example.birdnest.ui.theme.*
+import com.example.boardingbookingapp.data.model.RoommateProfile
+import com.example.boardingbookingapp.data.model.StudyHabit
+import com.example.boardingbookingapp.data.model.SleepPattern
+import com.example.boardingbookingapp.ui.components.*
+import com.example.boardingbookingapp.ui.theme.*
 
 @Composable
 fun RoommateFinderScreen(

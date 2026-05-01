@@ -1,8 +1,8 @@
-package com.example.birdnest.domain.usecase.listing
+package com.example.boardingbookingapp.domain.usecase.listing
 
-import com.example.birdnest.data.model.GenderPolicy
-import com.example.birdnest.data.model.Listing
-import com.example.birdnest.data.model.RoomType
+import com.example.boardingbookingapp.data.model.GenderPolicy
+import com.example.boardingbookingapp.data.model.Listing
+import com.example.boardingbookingapp.data.model.RoomType
 
 // Sprint 2 — pure function, no injection needed
 class FilterListingsUseCase {

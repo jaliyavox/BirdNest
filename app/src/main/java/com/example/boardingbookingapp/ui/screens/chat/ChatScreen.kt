@@ -1,4 +1,4 @@
-package com.example.birdnest.ui.screens.chat
+package com.example.boardingbookingapp.ui.screens.chat
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,9 +29,9 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.birdnest.ui.components.ModernBackground
-import com.example.birdnest.ui.components.ModernTextField
-import com.example.birdnest.ui.theme.*
+import com.example.boardingbookingapp.ui.components.ModernBackground
+import com.example.boardingbookingapp.ui.components.ModernTextField
+import com.example.boardingbookingapp.ui.theme.*
 
 private data class Msg(val text: String, val isMe: Boolean, val time: String)
 

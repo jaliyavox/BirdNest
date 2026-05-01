@@ -1,4 +1,4 @@
-package com.example.birdnest.ui.components
+package com.example.boardingbookingapp.ui.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -30,12 +30,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.birdnest.ui.theme.CyanAccent
-import com.example.birdnest.ui.theme.ErrorRed
-import com.example.birdnest.ui.theme.GlassBorder
-import com.example.birdnest.ui.theme.TextHint
-import com.example.birdnest.ui.theme.TextPrimary
-import com.example.birdnest.ui.theme.TextSecondary
+import com.example.boardingbookingapp.ui.theme.CyanAccent
+import com.example.boardingbookingapp.ui.theme.ErrorRed
+import com.example.boardingbookingapp.ui.theme.GlassBorder
+import com.example.boardingbookingapp.ui.theme.TextHint
+import com.example.boardingbookingapp.ui.theme.TextPrimary
+import com.example.boardingbookingapp.ui.theme.TextSecondary
 
 private val FieldShape = RoundedCornerShape(14.dp)
 

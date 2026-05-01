@@ -1,4 +1,4 @@
-package com.example.birdnest.ui.screens.roommate
+package com.example.boardingbookingapp.ui.screens.roommate
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -40,16 +40,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.birdnest.data.model.SleepPattern
-import com.example.birdnest.data.model.StudyHabit
-import com.example.birdnest.ui.components.GlassButton
-import com.example.birdnest.ui.components.GlassCard
-import com.example.birdnest.ui.components.GlassTextField
-import com.example.birdnest.ui.components.GradientBackground
-import com.example.birdnest.ui.theme.CyanAccent
-import com.example.birdnest.ui.theme.TextSecondary
-import com.example.birdnest.ui.theme.TextTertiary
-import com.example.birdnest.ui.theme.VioletPrimary
+import com.example.boardingbookingapp.data.model.SleepPattern
+import com.example.boardingbookingapp.data.model.StudyHabit
+import com.example.boardingbookingapp.ui.components.GlassButton
+import com.example.boardingbookingapp.ui.components.GlassCard
+import com.example.boardingbookingapp.ui.components.GlassTextField
+import com.example.boardingbookingapp.ui.components.GradientBackground
+import com.example.boardingbookingapp.ui.theme.CyanAccent
+import com.example.boardingbookingapp.ui.theme.TextSecondary
+import com.example.boardingbookingapp.ui.theme.TextTertiary
+import com.example.boardingbookingapp.ui.theme.VioletPrimary
 
 private val ALL_HOBBIES = listOf("Gaming", "Reading", "Cooking", "Gym", "Music", "Movies", "Sports", "Coding", "Art", "Travel", "Yoga", "Photography")
 private val FACULTIES = listOf("FCIIT", "FOE", "FOM", "FHSS", "FNDT", "FGS")

@@ -1,7 +1,7 @@
-package com.example.birdnest.data.repository
+package com.example.boardingbookingapp.data.repository
 
-import com.example.birdnest.data.model.RoommateProfile
-import com.example.birdnest.util.Result
+import com.example.boardingbookingapp.data.model.RoommateProfile
+import com.example.boardingbookingapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
 // Sprint 4 — implement with Firestore

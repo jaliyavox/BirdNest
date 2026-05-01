@@ -1,8 +1,8 @@
-package com.example.birdnest.data.remote.dto
+package com.example.boardingbookingapp.data.remote.dto
 
-import com.example.birdnest.data.model.GenderPolicy
-import com.example.birdnest.data.model.Listing
-import com.example.birdnest.data.model.RoomType
+import com.example.boardingbookingapp.data.model.GenderPolicy
+import com.example.boardingbookingapp.data.model.Listing
+import com.example.boardingbookingapp.data.model.RoomType
 
 data class ListingDto(
     val id: String = "",

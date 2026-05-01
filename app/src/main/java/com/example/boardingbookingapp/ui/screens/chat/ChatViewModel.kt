@@ -1,8 +1,8 @@
-package com.example.birdnest.ui.screens.chat
+package com.example.boardingbookingapp.ui.screens.chat
 
 import androidx.lifecycle.ViewModel
-import com.example.birdnest.data.model.ChatMessage
-import com.example.birdnest.data.model.Conversation
+import com.example.boardingbookingapp.data.model.ChatMessage
+import com.example.boardingbookingapp.data.model.Conversation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

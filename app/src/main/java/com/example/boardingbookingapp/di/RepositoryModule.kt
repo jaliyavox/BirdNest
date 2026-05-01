@@ -1,7 +1,7 @@
-package com.example.birdnest.di
+package com.example.boardingbookingapp.di
 
-import com.example.birdnest.data.repository.AuthRepository
-import com.example.birdnest.data.repository.FirebaseAuthRepository
+import com.example.boardingbookingapp.data.repository.AuthRepository
+import com.example.boardingbookingapp.data.repository.FirebaseAuthRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

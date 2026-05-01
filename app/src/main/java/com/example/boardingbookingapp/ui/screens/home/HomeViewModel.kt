@@ -1,9 +1,9 @@
-package com.example.birdnest.ui.screens.home
+package com.example.boardingbookingapp.ui.screens.home
 
 import androidx.lifecycle.ViewModel
-import com.example.birdnest.data.model.GenderPolicy
-import com.example.birdnest.data.model.Listing
-import com.example.birdnest.data.model.RoomType
+import com.example.boardingbookingapp.data.model.GenderPolicy
+import com.example.boardingbookingapp.data.model.Listing
+import com.example.boardingbookingapp.data.model.RoomType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

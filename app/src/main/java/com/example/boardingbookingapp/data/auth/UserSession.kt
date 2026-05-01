@@ -1,7 +1,7 @@
-package com.example.birdnest.data.auth
+package com.example.boardingbookingapp.data.auth
 
-import com.example.birdnest.data.model.User
-import com.example.birdnest.data.model.UserRole
+import com.example.boardingbookingapp.data.model.User
+import com.example.boardingbookingapp.data.model.UserRole
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 

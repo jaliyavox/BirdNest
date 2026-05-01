@@ -1,7 +1,7 @@
-package com.example.birdnest.di
+package com.example.boardingbookingapp.di
 
-import com.example.birdnest.data.remote.api.ListingApi
-import com.example.birdnest.util.Constants
+import com.example.boardingbookingapp.data.remote.api.ListingApi
+import com.example.boardingbookingapp.util.Constants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

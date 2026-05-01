@@ -1,13 +1,13 @@
-package com.example.birdnest.data.local
+package com.example.boardingbookingapp.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.example.birdnest.data.local.dao.ChatDao
-import com.example.birdnest.data.local.dao.ListingDao
-import com.example.birdnest.data.local.dao.UserDao
-import com.example.birdnest.data.local.entity.ChatMessageEntity
-import com.example.birdnest.data.local.entity.ListingEntity
-import com.example.birdnest.data.local.entity.UserEntity
+import com.example.boardingbookingapp.data.local.dao.ChatDao
+import com.example.boardingbookingapp.data.local.dao.ListingDao
+import com.example.boardingbookingapp.data.local.dao.UserDao
+import com.example.boardingbookingapp.data.local.entity.ChatMessageEntity
+import com.example.boardingbookingapp.data.local.entity.ListingEntity
+import com.example.boardingbookingapp.data.local.entity.UserEntity
 
 @Database(
     entities = [UserEntity::class, ListingEntity::class, ChatMessageEntity::class],

@@ -1,4 +1,4 @@
-package com.example.birdnest.ui.components
+package com.example.boardingbookingapp.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,8 +13,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.birdnest.ui.theme.GlassBorder
-import com.example.birdnest.ui.theme.GlassWhite
+import com.example.boardingbookingapp.ui.theme.GlassBorder
+import com.example.boardingbookingapp.ui.theme.GlassWhite
 
 @Composable
 fun GlassCard(

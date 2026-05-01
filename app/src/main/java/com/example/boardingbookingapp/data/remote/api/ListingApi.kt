@@ -1,6 +1,6 @@
-package com.example.birdnest.data.remote.api
+package com.example.boardingbookingapp.data.remote.api
 
-import com.example.birdnest.data.remote.dto.ListingDto
+import com.example.boardingbookingapp.data.remote.dto.ListingDto
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET

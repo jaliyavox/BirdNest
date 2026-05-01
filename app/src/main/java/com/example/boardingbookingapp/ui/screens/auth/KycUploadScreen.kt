@@ -1,4 +1,4 @@
-package com.example.birdnest.ui.screens.auth
+package com.example.boardingbookingapp.ui.screens.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,8 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.birdnest.ui.components.*
-import com.example.birdnest.ui.theme.*
+import com.example.boardingbookingapp.ui.components.*
+import com.example.boardingbookingapp.ui.theme.*
 
 @Composable
 fun KycUploadScreen(

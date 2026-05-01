@@ -1,4 +1,4 @@
-package com.example.birdnest.ui.screens.splash
+package com.example.boardingbookingapp.ui.screens.splash
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -28,10 +28,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.birdnest.ui.components.ModernBackground
-import com.example.birdnest.ui.theme.ModernPrimary
-import com.example.birdnest.ui.theme.ModernTextPrimary
-import com.example.birdnest.ui.theme.ModernTextSecondary
+import com.example.boardingbookingapp.ui.components.ModernBackground
+import com.example.boardingbookingapp.ui.theme.ModernPrimary
+import com.example.boardingbookingapp.ui.theme.ModernTextPrimary
+import com.example.boardingbookingapp.ui.theme.ModernTextSecondary
 import kotlinx.coroutines.delay
 
 @Composable

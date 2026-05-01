@@ -1,10 +1,10 @@
-package com.example.birdnest.data.local.dao
+package com.example.boardingbookingapp.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.birdnest.data.local.entity.ChatMessageEntity
+import com.example.boardingbookingapp.data.local.entity.ChatMessageEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

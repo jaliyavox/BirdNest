@@ -1,4 +1,4 @@
-package com.example.birdnest.util
+package com.example.boardingbookingapp.util
 
 object Constants {
     const val BASE_URL = "https://us-central1-birdnest-app.cloudfunctions.net/api/"

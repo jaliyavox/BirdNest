@@ -1,9 +1,9 @@
-package com.example.birdnest.data.local.dao
+package com.example.boardingbookingapp.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import com.example.birdnest.data.local.entity.ListingEntity
+import com.example.boardingbookingapp.data.local.entity.ListingEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
