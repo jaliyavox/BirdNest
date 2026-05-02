@@ -14,10 +14,12 @@ import com.example.boardingbookingapp.ui.screens.auth.LoginScreen
 import com.example.boardingbookingapp.ui.screens.auth.OtpVerifyScreen
 import com.example.boardingbookingapp.ui.screens.auth.OwnerLoginScreen
 import com.example.boardingbookingapp.ui.screens.auth.OwnerRegisterScreen
-import com.example.boardingbookingapp.ui.screens.auth.RegisterScreen
+import com.example.boardingbookingapp.ui.screens.auth.StudentRegisterScreen
+import com.example.boardingbookingapp.ui.screens.auth.WelcomeScreen
 import com.example.boardingbookingapp.ui.screens.chat.ChatScreen
 import com.example.boardingbookingapp.ui.screens.chat.ConversationsScreen
 import com.example.boardingbookingapp.ui.screens.home.HomeScreen
+import com.example.boardingbookingapp.ui.screens.home.StudentDashboardScreen
 import com.example.boardingbookingapp.ui.screens.listings.ListingDetailScreen
 import com.example.boardingbookingapp.ui.screens.listings.ListingsScreen
 import com.example.boardingbookingapp.ui.screens.listings.PostListingScreen
@@ -30,7 +32,6 @@ import com.example.boardingbookingapp.ui.screens.profile.SubmitTicketScreen
 import com.example.boardingbookingapp.ui.screens.roommate.RoommateFinderScreen
 import com.example.boardingbookingapp.ui.screens.roommate.RoommateProfileScreen
 import com.example.boardingbookingapp.ui.screens.splash.SplashScreen
-
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.example.boardingbookingapp.data.auth.UserSession
@@ -49,6 +50,7 @@ fun NavGraph(
         startDestination = Screen.Splash.route,
         modifier         = modifier,
     ) {
+        // ── Splash ────────────────────────────────────────────────────
         composable(Screen.Splash.route) {
             SplashScreen(onNavigateNext = {
                 navController.navigate(Screen.Onboarding.route) {
@@ -57,62 +59,202 @@ fun NavGraph(
             })
         }
 
+        // ── Onboarding → Welcome ──────────────────────────────────────
         composable(Screen.Onboarding.route) {
             OnboardingScreen(onFinish = {
-                navController.navigate(Screen.Home.route) {
+                navController.navigate(Screen.Welcome.route) {
                     popUpTo(Screen.Onboarding.route) { inclusive = true }
                 }
             })
         }
 
-        composable(Screen.Login.route) {
-            LoginScreen(
-                onOtpSent = { email ->
-                    navController.navigate(Screen.OtpVerify.createRoute(email))
-                },
-                onNavigateToOwnerLogin = {
-                    navController.navigate(Screen.OwnerLogin.route)
-                },
+        // ── Welcome (landing) ─────────────────────────────────────────
+        composable(Screen.Welcome.route) {
+            WelcomeScreen(
+                onRegisterStudent = { navController.navigate(Screen.StudentRegister.route) },
+                onStudentLogin    = { navController.navigate(Screen.Login.route) },
+                onOwnerLogin      = { navController.navigate(Screen.OwnerLogin.route) },
             )
         }
 
+        // ── Student register ──────────────────────────────────────────
+        composable(Screen.StudentRegister.route) {
+            StudentRegisterScreen(
+                onRegistered = {
+                    navController.navigate(Screen.StudentDashboard.route) {
+                        popUpTo(Screen.Welcome.route) { inclusive = false }
+                    }
+                },
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.StudentRegister.route) { inclusive = true }
+                    }
+                },
+                onBack = { navController.popBackStack() },
+            )
+        }
+
+        // ── Student login ─────────────────────────────────────────────
+        composable(Screen.Login.route) {
+            LoginScreen(
+                onLoggedIn = {
+                    navController.navigate(Screen.StudentDashboard.route) {
+                        popUpTo(Screen.Welcome.route) { inclusive = false }
+                    }
+                },
+                onNavigateToOwnerLogin = { navController.navigate(Screen.OwnerLogin.route) },
+                onNavigateToRegister   = { navController.navigate(Screen.StudentRegister.route) },
+            )
+        }
+
+        // ── OTP verify ────────────────────────────────────────────────
         composable(
             route     = Screen.OtpVerify.route,
             arguments = listOf(navArgument("email") { type = NavType.StringType }),
         ) { back ->
             val email = back.arguments?.getString("email")?.replace("%40", "@") ?: ""
             OtpVerifyScreen(
-                email      = email,
+                email     = email,
                 onVerified = {
-                    navController.navigate(Screen.Register.route) {
-                        popUpTo(Screen.Login.route) { inclusive = false }
+                    navController.navigate(Screen.StudentDashboard.route) {
+                        popUpTo(Screen.Welcome.route) { inclusive = false }
                     }
                 },
                 onBack = { navController.popBackStack() },
             )
         }
 
-        composable(Screen.Register.route) {
-            RegisterScreen(
-                onRegistrationComplete = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
-                    }
+        // ── Student dashboard ─────────────────────────────────────────
+        composable(Screen.StudentDashboard.route) {
+            StudentDashboardScreen(
+                onBrowseListings = { navController.navigate(Screen.Home.route) },
+                onMessages       = { navController.navigate(Screen.Conversations.route) },
+                onPayments       = { navController.navigate(Screen.RentTracker.route) },
+                onRoommateFinder = { navController.navigate(Screen.RoommateFinder.route) },
+                onSubmitReview   = { navController.navigate(Screen.Listings.route) },
+                onSupportTicket  = { navController.navigate(Screen.SubmitTicket.route) },
+            )
+        }
+
+        // ── Browse listings (old home) ────────────────────────────────
+        composable(Screen.Home.route) {
+            HomeScreen(
+                onListingClick = { id ->
+                    navController.navigate(Screen.ListingDetail.createRoute(id))
+                },
+                onRoommateFinderClick = {
+                    navController.navigate(Screen.RoommateFinder.route)
                 },
             )
         }
 
+        composable(Screen.Listings.route) {
+            ListingsScreen(
+                onListingClick = { id ->
+                    navController.navigate(Screen.ListingDetail.createRoute(id))
+                },
+            )
+        }
+
+        composable(
+            route     = Screen.ListingDetail.route,
+            arguments = listOf(navArgument("listingId") { type = NavType.StringType }),
+        ) { back ->
+            val id = back.arguments?.getString("listingId") ?: ""
+            ListingDetailScreen(
+                listingId         = id,
+                isStudentSignedIn = isStudentSignedIn,
+                onContactOwner    = { ownerId -> navController.navigate(Screen.Chat.createRoute(ownerId)) },
+                onSignInRequired  = { navController.navigate(Screen.Welcome.route) },
+                onBack            = { navController.popBackStack() },
+            )
+        }
+
+        composable(Screen.PostListing.route) {
+            PostListingScreen(
+                onListingPosted = { navController.popBackStack() },
+                onBack          = { navController.popBackStack() },
+            )
+        }
+
+        // ── Roommate finder ───────────────────────────────────────────
+        composable(Screen.RoommateFinder.route) {
+            RoommateFinderScreen(
+                onOpenProfile     = { navController.navigate(Screen.RoommateProfile.route) },
+                onMessageRoommate = { uid -> navController.navigate(Screen.Chat.createRoute(uid)) },
+                onBack            = { navController.popBackStack() },
+            )
+        }
+
+        composable(Screen.RoommateProfile.route) {
+            RoommateProfileScreen(
+                onSaved = { navController.popBackStack() },
+                onBack  = { navController.popBackStack() },
+            )
+        }
+
+        // ── Chat ──────────────────────────────────────────────────────
+        composable(Screen.Conversations.route) {
+            ConversationsScreen(
+                onOpenChat = { cid -> navController.navigate(Screen.Chat.createRoute(cid)) },
+            )
+        }
+
+        composable(
+            route     = Screen.Chat.route,
+            arguments = listOf(navArgument("conversationId") { type = NavType.StringType }),
+        ) { back ->
+            val cid = back.arguments?.getString("conversationId") ?: ""
+            ChatScreen(
+                conversationId = cid,
+                onBack         = { navController.popBackStack() },
+            )
+        }
+
+        // ── Payments ──────────────────────────────────────────────────
+        composable(Screen.RentTracker.route) {
+            RentTrackerScreen(
+                onBack          = { navController.popBackStack() },
+                onUploadReceipt = { navController.navigate(Screen.ReceiptUpload.route) },
+            )
+        }
+
+        composable(Screen.ReceiptUpload.route) {
+            ReceiptUploadScreen(onBack = { navController.popBackStack() })
+        }
+
+        // ── Profile ───────────────────────────────────────────────────
+        composable(Screen.Profile.route) {
+            ProfileScreen(
+                onSignOut = {
+                    navController.navigate(Screen.Welcome.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+                onOpenRentTracker = { navController.navigate(Screen.RentTracker.route) },
+                onSubmitFeedback  = { navController.navigate(Screen.SubmitFeedback.route) },
+                onSubmitTicket    = { navController.navigate(Screen.SubmitTicket.route) },
+            )
+        }
+
+        composable(Screen.SubmitFeedback.route) {
+            SubmitFeedbackScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(Screen.SubmitTicket.route) {
+            SubmitTicketScreen(onBack = { navController.popBackStack() })
+        }
+
+        // ── Owner flow ────────────────────────────────────────────────
         composable(Screen.OwnerLogin.route) {
             OwnerLoginScreen(
-                onLoggedIn = {
+                onLoggedIn            = {
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
+                        popUpTo(Screen.Welcome.route) { inclusive = false }
                     }
                 },
-                onNavigateToRegister = {
-                    navController.navigate(Screen.OwnerRegister.route)
-                },
-                onBack = { navController.popBackStack() },
+                onNavigateToRegister  = { navController.navigate(Screen.OwnerRegister.route) },
+                onBack                = { navController.popBackStack() },
             )
         }
 
@@ -142,127 +284,15 @@ fun NavGraph(
             KycPendingScreen(
                 onApproved = {
                     navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
+                        popUpTo(Screen.Welcome.route) { inclusive = false }
                     }
                 },
             )
         }
 
-        composable(Screen.Home.route) {
-            HomeScreen(
-                onListingClick = { id ->
-                    navController.navigate(Screen.ListingDetail.createRoute(id))
-                },
-                onRoommateFinderClick = {
-                    navController.navigate(Screen.RoommateFinder.route)
-                },
-            )
-        }
-
-        composable(Screen.Listings.route) {
-            ListingsScreen(
-                onListingClick = { id ->
-                    navController.navigate(Screen.ListingDetail.createRoute(id))
-                },
-            )
-        }
-
-        composable(
-            route     = Screen.ListingDetail.route,
-            arguments = listOf(navArgument("listingId") { type = NavType.StringType }),
-        ) { back ->
-            val id = back.arguments?.getString("listingId") ?: ""
-            ListingDetailScreen(
-                listingId     = id,
-                isStudentSignedIn = isStudentSignedIn,
-                onContactOwner = { ownerId ->
-                    navController.navigate(Screen.Chat.createRoute(ownerId))
-                },
-                onSignInRequired = {
-                    navController.navigate(Screen.Login.route)
-                },
-                onBack = { navController.popBackStack() },
-            )
-        }
-
-        composable(Screen.PostListing.route) {
-            PostListingScreen(
-                onListingPosted = { navController.popBackStack() },
-                onBack          = { navController.popBackStack() },
-            )
-        }
-
-        composable(Screen.RoommateFinder.route) {
-            RoommateFinderScreen(
-                onOpenProfile      = { navController.navigate(Screen.RoommateProfile.route) },
-                onMessageRoommate  = { uid -> navController.navigate(Screen.Chat.createRoute(uid)) },
-                onBack             = { navController.popBackStack() },
-            )
-        }
-
-        composable(Screen.RoommateProfile.route) {
-            RoommateProfileScreen(
-                onSaved = { navController.popBackStack() },
-                onBack  = { navController.popBackStack() },
-            )
-        }
-
-        composable(Screen.Conversations.route) {
-            ConversationsScreen(
-                onOpenChat = { cid ->
-                    navController.navigate(Screen.Chat.createRoute(cid))
-                },
-            )
-        }
-
-        composable(
-            route     = Screen.Chat.route,
-            arguments = listOf(navArgument("conversationId") { type = NavType.StringType }),
-        ) { back ->
-            val cid = back.arguments?.getString("conversationId") ?: ""
-            ChatScreen(
-                conversationId = cid,
-                onBack         = { navController.popBackStack() },
-            )
-        }
-
-        composable(Screen.RentTracker.route) {
-            RentTrackerScreen(
-                onBack = { navController.popBackStack() },
-                onUploadReceipt = { navController.navigate(Screen.ReceiptUpload.route) },
-            )
-        }
-
-        composable(Screen.ReceiptUpload.route) {
-            ReceiptUploadScreen(onBack = { navController.popBackStack() })
-        }
-
-        composable(Screen.Profile.route) {
-            ProfileScreen(
-                onSignOut = {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                },
-                onOpenRentTracker = { navController.navigate(Screen.RentTracker.route) },
-                onOpenAdmin = { navController.navigate(Screen.AdminDashboard.route) },
-                onSubmitFeedback = { navController.navigate(Screen.SubmitFeedback.route) },
-                onSubmitTicket = { navController.navigate(Screen.SubmitTicket.route) },
-            )
-        }
-
-        composable(Screen.SubmitFeedback.route) {
-            SubmitFeedbackScreen(onBack = { navController.popBackStack() })
-        }
-
-        composable(Screen.SubmitTicket.route) {
-            SubmitTicketScreen(onBack = { navController.popBackStack() })
-        }
-
+        // ── Admin (separate entry point) ──────────────────────────────
         composable(Screen.AdminDashboard.route) {
-            AdminDashboardScreen(
-                onBack = { navController.popBackStack() },
-            )
+            AdminDashboardScreen(onBack = { navController.popBackStack() })
         }
     }
 }

@@ -4,16 +4,21 @@ import com.example.boardingbookingapp.data.model.User
 import com.example.boardingbookingapp.util.Result
 import kotlinx.coroutines.flow.Flow
 
-// Sprint 1 — implement with Firebase Auth + Firestore + Resend email API
 interface AuthRepository {
     val currentUser: Flow<User?>
 
-    // Student auth — email/password with @my.sliit.lk domain gate
-    suspend fun sendOtp(email: String): Result<Unit>          // calls Resend API via Firebase Function
+    suspend fun registerStudent(
+        email: String, password: String,
+        firstName: String, lastName: String,
+        dateOfBirth: Long, mobileNumber: String,
+        gender: com.example.boardingbookingapp.data.model.Gender,
+        academicYear: Int,
+    ): Result<User>
+
+    suspend fun sendOtp(email: String): Result<Unit>
     suspend fun verifyOtp(email: String, otp: String): Result<User>
     suspend fun signInWithEmail(email: String, password: String): Result<User>
 
-    // Owner auth — email/password + KYC
     suspend fun registerOwner(email: String, password: String): Result<User>
     suspend fun submitKyc(userId: String, nicImageUri: String, selfieUri: String): Result<Unit>
 

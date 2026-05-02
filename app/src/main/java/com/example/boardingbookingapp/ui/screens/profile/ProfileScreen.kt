@@ -2,26 +2,28 @@ package com.example.boardingbookingapp.ui.screens.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.boardingbookingapp.data.auth.UserSession
+import com.example.boardingbookingapp.data.model.UserRole
 import com.example.boardingbookingapp.ui.components.*
 import com.example.boardingbookingapp.ui.theme.*
 
@@ -29,10 +31,24 @@ import com.example.boardingbookingapp.ui.theme.*
 fun ProfileScreen(
     onSignOut: () -> Unit,
     onOpenRentTracker: () -> Unit,
-    onOpenAdmin: () -> Unit,
     onSubmitFeedback: () -> Unit = {},
     onSubmitTicket: () -> Unit = {},
+    viewModel: ProfileViewModel = hiltViewModel(),
 ) {
+    val user by UserSession.currentUser.collectAsState()
+
+    val displayName = user?.let {
+        it.displayName.ifBlank { "${it.firstName} ${it.lastName}".trim() }
+    } ?: "Student"
+    val initial = displayName.firstOrNull()?.uppercase() ?: "?"
+    val email = user?.email ?: ""
+    val roleLabel = when (user?.role) {
+        UserRole.OWNER -> "OWNER"
+        UserRole.ADMIN -> "ADMIN"
+        else -> "STUDENT"
+    }
+    val isVerified = user?.isEmailVerified == true
+
     ModernBackground {
         LazyColumn(
             modifier = Modifier
@@ -42,7 +58,6 @@ fun ProfileScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             item {
-                // Header profile card
                 ModernCard(modifier = Modifier.fillMaxWidth()) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Box(
@@ -52,45 +67,33 @@ fun ProfileScreen(
                                 .background(ModernPrimary),
                             contentAlignment = Alignment.Center,
                         ) {
-                            Text("S", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 36.sp)
+                            Text(initial, color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 36.sp)
                         }
                         Spacer(Modifier.height(16.dp))
-                        Text("Sathira Malshan", color = ModernTextPrimary, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                        Text(displayName, color = ModernTextPrimary, fontSize = 22.sp, fontWeight = FontWeight.Bold)
                         Spacer(Modifier.height(4.dp))
-                        Text("sathira@my.sliit.lk", color = ModernTextSecondary, fontSize = 14.sp)
+                        Text(email, color = ModernTextSecondary, fontSize = 14.sp)
                         Spacer(Modifier.height(12.dp))
 
                         Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
-                            ModernBadge("STUDENT", ModernPrimary)
-                            ModernBadge("VERIFIED", SuccessGreen)
+                            ModernBadge(roleLabel, ModernPrimary)
+                            if (isVerified) ModernBadge("VERIFIED", SuccessGreen)
                         }
 
-                        Spacer(Modifier.height(24.dp))
-
-                        // Stats
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                            ProfileStat("3", "Saved")
-                            Box(modifier = Modifier.size(width = 1.dp, height = 30.dp).background(ModernTextTertiary.copy(alpha = 0.2f)))
-                            ProfileStat("12", "Views")
-                            Box(modifier = Modifier.size(width = 1.dp, height = 30.dp).background(ModernTextTertiary.copy(alpha = 0.2f)))
-                            ProfileStat("5", "Active")
+                        if (user?.academicYear != null && user!!.academicYear > 0) {
+                            Spacer(Modifier.height(12.dp))
+                            Text("Year ${user!!.academicYear} · ${user!!.gender.name.lowercase().replaceFirstChar { it.uppercase() }}", color = ModernTextSecondary, fontSize = 13.sp)
                         }
                     }
                 }
             }
 
             item {
-                Text("General Settings", color = ModernTextPrimary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text("Settings", color = ModernTextPrimary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
 
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    ActionItem(
-                        icon  = Icons.Default.Bookmark,
-                        label = "Saved Listings",
-                        sub   = "3 items saved",
-                        onClick = {},
-                    )
                     ActionItem(
                         icon  = Icons.Default.Groups,
                         label = "Roommate Preferences",
@@ -102,12 +105,6 @@ fun ProfileScreen(
                         label = "Rent Tracker",
                         sub   = "Manage payments",
                         onClick = onOpenRentTracker,
-                    )
-                    ActionItem(
-                        icon  = Icons.Default.AdminPanelSettings,
-                        label = "Admin Panel",
-                        sub   = "Application metrics",
-                        onClick = onOpenAdmin,
                     )
                     ActionItem(
                         icon  = Icons.Default.Feedback,
@@ -127,10 +124,15 @@ fun ProfileScreen(
             item {
                 ModernButton(
                     text = "Log Out",
-                    onClick = onSignOut,
+                    onClick = {
+                        viewModel.signOut()
+                        onSignOut()
+                    },
                     containerColor = Color.White,
                     contentColor = ErrorRed,
-                    modifier = Modifier.fillMaxWidth().border(1.dp, ModernTextTertiary.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, ModernTextTertiary.copy(alpha = 0.1f), RoundedCornerShape(16.dp)),
                 )
                 Spacer(Modifier.height(20.dp))
             }
@@ -151,24 +153,13 @@ private fun ModernBadge(label: String, color: Color) {
 }
 
 @Composable
-private fun ProfileStat(value: String, label: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(value, color = ModernTextPrimary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-        Text(label, color = ModernTextSecondary, fontSize = 13.sp)
-    }
-}
-
-@Composable
 private fun ActionItem(
     icon: ImageVector,
     label: String,
     sub: String,
     onClick: () -> Unit,
 ) {
-    ModernCard(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onClick
-    ) {
+    ModernCard(modifier = Modifier.fillMaxWidth(), onClick = onClick) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp),

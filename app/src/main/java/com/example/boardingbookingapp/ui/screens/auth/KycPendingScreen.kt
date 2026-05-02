@@ -5,18 +5,7 @@ import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -38,14 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.boardingbookingapp.ui.components.GlassButton
-import com.example.boardingbookingapp.ui.components.GlassCard
-import com.example.boardingbookingapp.ui.components.GradientBackground
-import com.example.boardingbookingapp.ui.theme.SuccessGreen
-import com.example.boardingbookingapp.ui.theme.TextSecondary
-import com.example.boardingbookingapp.ui.theme.TextTertiary
-import com.example.boardingbookingapp.ui.theme.VioletLight
-import com.example.boardingbookingapp.ui.theme.WarningAmber
+import com.example.boardingbookingapp.ui.components.*
+import com.example.boardingbookingapp.ui.theme.*
 import kotlinx.coroutines.delay
 
 @Composable
@@ -70,56 +53,53 @@ fun KycPendingScreen(
         demoReady = true
     }
 
-    GradientBackground {
+    ModernBackground {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .systemBarsPadding()
+                .statusBarsPadding()
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
             Box(
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(120.dp)
                     .scale(pulse.value)
                     .clip(CircleShape)
-                    .background(WarningAmber.copy(alpha = 0.15f))
-                    .border(2.dp, WarningAmber.copy(alpha = 0.50f), CircleShape),
+                    .background(WarningAmber.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(Icons.Default.HourglassEmpty, contentDescription = null, tint = WarningAmber, modifier = Modifier.size(44.dp))
+                Icon(Icons.Default.HourglassEmpty, contentDescription = null, tint = WarningAmber, modifier = Modifier.size(56.dp))
             }
 
-            Spacer(Modifier.height(32.dp))
-            Text("Verification Pending", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(40.dp))
+            Text("Verification in Progress", color = ModernTextPrimary, fontSize = 28.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+            Spacer(Modifier.height(12.dp))
             Text(
-                text      = "Your documents are under review.\nThis usually takes 24–48 hours.",
-                color     = TextSecondary,
-                fontSize  = 15.sp,
+                text      = "Our team is reviewing your documents.\nThis usually takes about 24 hours.",
+                color     = ModernTextSecondary,
+                fontSize  = 16.sp,
                 textAlign = TextAlign.Center,
-                lineHeight = 22.sp,
+                lineHeight = 24.sp,
             )
 
-            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(48.dp))
 
-            GlassCard(modifier = Modifier.fillMaxWidth()) {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            ModernCard(modifier = Modifier.fillMaxWidth()) {
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     KycStep(number = "1", label = "Documents Uploaded", done = true)
                     KycStep(number = "2", label = "Admin Review", done = false, active = true)
                     KycStep(number = "3", label = "Account Activated", done = false)
                 }
             }
 
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(48.dp))
 
             if (demoReady) {
-                Text("Demo: Skip wait and enter app", color = TextTertiary, fontSize = 12.sp)
-                Spacer(Modifier.height(8.dp))
-                GlassButton(text = "Continue to App (Demo)", onClick = onApproved)
+                ModernButton(text = "Enter App (Demo)", onClick = onApproved)
             } else {
-                Text("We'll notify you via email when approved", color = TextTertiary, fontSize = 13.sp)
+                Text("We'll notify you via email when approved", color = ModernTextTertiary, fontSize = 14.sp, fontWeight = FontWeight.Medium)
             }
         }
     }
@@ -129,32 +109,31 @@ fun KycPendingScreen(
 private fun KycStep(number: String, label: String, done: Boolean, active: Boolean = false) {
     val color = when {
         done   -> SuccessGreen
-        active -> VioletLight
-        else   -> TextTertiary
+        active -> ModernPrimary
+        else   -> ModernTextTertiary
     }
     Row(
         verticalAlignment   = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Box(
             modifier = Modifier
-                .size(28.dp)
+                .size(32.dp)
                 .clip(CircleShape)
-                .background(color.copy(alpha = 0.20f))
-                .border(1.dp, color.copy(alpha = 0.60f), CircleShape),
+                .background(color.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center,
         ) {
             if (done) {
-                Icon(Icons.Default.CheckCircle, null, tint = color, modifier = Modifier.size(16.dp))
+                Icon(Icons.Default.CheckCircle, null, tint = color, modifier = Modifier.size(20.dp))
             } else {
-                Text(number, color = color, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text(number, color = color, fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
         }
         Text(
             text       = label,
-            color      = if (done || active) Color.White else TextTertiary,
-            fontSize   = 14.sp,
-            fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal,
+            color      = if (done || active) ModernTextPrimary else ModernTextSecondary,
+            fontSize   = 15.sp,
+            fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
         )
     }
 }

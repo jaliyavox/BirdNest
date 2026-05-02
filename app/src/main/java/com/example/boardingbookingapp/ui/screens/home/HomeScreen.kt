@@ -41,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.boardingbookingapp.data.auth.UserSession
 import com.example.boardingbookingapp.data.model.GenderPolicy
 import com.example.boardingbookingapp.data.model.RoomType
 import com.example.boardingbookingapp.ui.components.*
@@ -56,6 +57,10 @@ fun HomeScreen(
     val query by viewModel.searchQuery.collectAsState()
     val selectedRoomType by viewModel.selectedRoomType.collectAsState()
     val selectedGender by viewModel.selectedGender.collectAsState()
+    val currentUser by UserSession.currentUser.collectAsState()
+    val userInitial = currentUser?.firstName?.firstOrNull()?.uppercase()
+        ?: currentUser?.displayName?.firstOrNull()?.uppercase()
+        ?: "?"
 
     ModernBackground {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -101,7 +106,7 @@ fun HomeScreen(
                                 .background(ModernPrimary),
                             contentAlignment = Alignment.Center,
                         ) {
-                            Text("S", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                            Text(userInitial, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                         }
                     }
                 }

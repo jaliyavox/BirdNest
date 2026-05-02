@@ -117,7 +117,7 @@ fun RegisterScreen(
 
                     ModernButton(
                         text      = "Complete Registration",
-                        onClick   = { keyboard?.hide(); viewModel.completeStudentProfile(displayName.trim()) },
+                        onClick   = { keyboard?.hide(); onRegistrationComplete() },
                         isLoading = state is AuthState.Loading,
                         enabled   = displayName.isNotBlank(),
                     )

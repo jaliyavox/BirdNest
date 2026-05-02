@@ -34,6 +34,7 @@ class MainActivity : ComponentActivity() {
                 val currentRoute = navBackStack?.destination?.route
 
                 val bottomBarRoutes = setOf(
+                    Screen.StudentDashboard.route,
                     Screen.Home.route,
                     Screen.Listings.route,
                     Screen.Conversations.route,

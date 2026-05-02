@@ -1,18 +1,21 @@
 package com.example.boardingbookingapp.ui.navigation
 
 sealed class Screen(val route: String) {
-    data object Splash          : Screen("splash")
-    data object Onboarding      : Screen("onboarding")
-    data object Login           : Screen("login")
-    data object OtpVerify       : Screen("otp_verify/{email}") {
+    data object Splash           : Screen("splash")
+    data object Onboarding       : Screen("onboarding")
+    data object Welcome          : Screen("welcome")
+    data object StudentRegister  : Screen("student_register")
+    data object Login            : Screen("login")
+    data object OtpVerify        : Screen("otp_verify/{email}") {
         fun createRoute(email: String) = "otp_verify/${email.replace("@", "%40")}"
     }
-    data object Register        : Screen("register")
-    data object OwnerLogin      : Screen("owner_login")
-    data object OwnerRegister   : Screen("owner_register")
-    data object KycUpload       : Screen("kyc_upload")
-    data object KycPending      : Screen("kyc_pending")
-    data object Home            : Screen("home")
+    data object Register         : Screen("register")
+    data object OwnerLogin       : Screen("owner_login")
+    data object OwnerRegister    : Screen("owner_register")
+    data object KycUpload        : Screen("kyc_upload")
+    data object KycPending       : Screen("kyc_pending")
+    data object StudentDashboard : Screen("student_dashboard")
+    data object Home             : Screen("home")
     data object Listings        : Screen("listings")
     data object ListingDetail   : Screen("listing/{listingId}") {
         fun createRoute(id: String) = "listing/$id"

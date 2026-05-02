@@ -80,7 +80,7 @@ fun OtpVerifyScreen(
     }
 
     LaunchedEffect(state) {
-        if (state is AuthState.NeedsProfile) onVerified()
+        if (state is AuthState.Authenticated) onVerified()
     }
 
     ModernBackground {
@@ -115,7 +115,7 @@ fun OtpVerifyScreen(
             Text("Verification", color = ModernTextPrimary, fontSize = 32.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
             Text(
-                text = "Enter the 6-digit code we sent to\n$email",
+                text = "Enter the 4-digit code we sent to\n$email",
                 color = ModernTextSecondary,
                 fontSize = 15.sp,
                 textAlign = TextAlign.Center,
@@ -129,7 +129,7 @@ fun OtpVerifyScreen(
                     OtpInputRow(
                         value         = otp,
                         onValueChange = {
-                            if (it.length <= 6 && it.all { c -> c.isDigit() }) otp = it
+                            if (it.length <= 4 && it.all { c -> c.isDigit() }) otp = it
                         },
                         isError = state is AuthState.Error,
                     )
@@ -145,7 +145,7 @@ fun OtpVerifyScreen(
                         text      = "Verify Code",
                         onClick   = { viewModel.verifyOtp(otp) },
                         isLoading = state is AuthState.Loading,
-                        enabled   = otp.length == 6,
+                        enabled   = otp.length == 4,
                     )
 
                     Spacer(Modifier.height(24.dp))
@@ -185,7 +185,7 @@ private fun OtpInputRow(
         cursorBrush = SolidColor(ModernPrimary),
         decorationBox = {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                repeat(6) { index ->
+                repeat(4) { index ->
                     val char = value.getOrNull(index)?.toString() ?: ""
                     val isCurrent = value.length == index
                     Box(

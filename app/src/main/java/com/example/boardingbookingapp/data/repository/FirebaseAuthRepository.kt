@@ -1,5 +1,7 @@
 package com.example.boardingbookingapp.data.repository
 
+import android.util.Log
+import com.example.boardingbookingapp.data.model.Gender
 import com.example.boardingbookingapp.data.model.KycStatus
 import com.example.boardingbookingapp.data.model.User
 import com.example.boardingbookingapp.data.model.UserRole
@@ -7,12 +9,18 @@ import com.example.boardingbookingapp.util.Constants
 import com.example.boardingbookingapp.util.Result
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 import javax.inject.Singleton
+
+private const val TAG = "AuthRepo"
+private const val FIRESTORE_TIMEOUT_MS = 15_000L
 
 @Singleton
 class FirebaseAuthRepository @Inject constructor(
@@ -28,9 +36,7 @@ class FirebaseAuthRepository @Inject constructor(
             } else {
                 firestore.collection(Constants.COLLECTION_USERS).document(uid)
                     .get()
-                    .addOnSuccessListener { doc ->
-                        trySend(doc.toObject(User::class.java))
-                    }
+                    .addOnSuccessListener { doc -> trySend(doc.toObject(User::class.java)) }
                     .addOnFailureListener { trySend(null) }
             }
         }
@@ -38,49 +44,50 @@ class FirebaseAuthRepository @Inject constructor(
         awaitClose { auth.removeAuthStateListener(listener) }
     }
 
-    // OTP flow: stores a generated code in Firestore; a Cloud Function (Resend) sends the email.
-    // Until the Cloud Function is deployed, any 6-digit code is accepted in verifyOtp().
-    override suspend fun sendOtp(email: String): Result<Unit> {
-        if (!isEmailValid(email)) return Result.Error("Only @my.sliit.lk emails are allowed")
+    override suspend fun registerStudent(
+        email: String, password: String,
+        firstName: String, lastName: String,
+        dateOfBirth: Long, mobileNumber: String,
+        gender: Gender, academicYear: Int,
+    ): Result<User> {
         return try {
-            val otp = (100000..999999).random().toString()
-            firestore.collection("otp_requests")
-                .document(email.lowercase())
-                .set(mapOf("otp" to otp, "createdAt" to System.currentTimeMillis()))
-                .await()
-            // TODO: Cloud Function picks this up and sends via Resend API
-            Result.Success(Unit)
+            Log.d(TAG, "registerStudent: creating auth user for $email")
+            val result = auth.createUserWithEmailAndPassword(email, password).await()
+            val uid = result.user?.uid ?: return Result.Error("Registration failed")
+            Log.d(TAG, "registerStudent: auth user created, uid=$uid — writing Firestore profile")
+            val user = User(
+                id = uid, email = email,
+                firstName = firstName, lastName = lastName,
+                displayName = "$firstName $lastName",
+                dateOfBirth = dateOfBirth,
+                mobileNumber = mobileNumber,
+                gender = gender,
+                academicYear = academicYear,
+                role = UserRole.STUDENT,
+                isEmailVerified = true,
+                createdAt = System.currentTimeMillis(),
+            )
+            withTimeout(FIRESTORE_TIMEOUT_MS) {
+                firestore.collection(Constants.COLLECTION_USERS).document(uid).set(user).await()
+            }
+            Log.d(TAG, "registerStudent: Firestore profile written for uid=$uid")
+            Result.Success(user)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: TimeoutCancellationException) {
+            Log.e(TAG, "registerStudent: Firestore write timed out — check Firestore rules / network", e)
+            Result.Error("Firestore write timed out. Check your Firestore security rules — they may be blocking writes for authenticated users.")
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to send OTP")
+            Log.e(TAG, "registerStudent: failed", e)
+            Result.Error(e.message ?: "Registration failed")
         }
     }
 
-    override suspend fun verifyOtp(email: String, otp: String): Result<User> {
-        return try {
-            val doc = firestore.collection("otp_requests")
-                .document(email.lowercase())
-                .get().await()
-            val storedOtp = doc.getString("otp") ?: ""
-            val createdAt = doc.getLong("createdAt") ?: 0L
-            val expired = System.currentTimeMillis() - createdAt > 10 * 60 * 1000 // 10 min
-            if (otp != storedOtp || expired) {
-                return Result.Error("Invalid or expired OTP")
-            }
-            // Sign in via email link auth or anonymous + custom claim; use email/password workaround
-            val password = "otp_${otp}_${email.lowercase().hashCode()}"
-            val result = try {
-                auth.signInWithEmailAndPassword(email, password).await()
-            } catch (_: Exception) {
-                auth.createUserWithEmailAndPassword(email, password).await()
-            }
-            val uid = result.user?.uid ?: return Result.Error("Auth failed")
-            val user = User(id = uid, email = email, role = UserRole.STUDENT, isEmailVerified = true)
-            firestore.collection(Constants.COLLECTION_USERS).document(uid).set(user).await()
-            Result.Success(user)
-        } catch (e: Exception) {
-            Result.Error(e.message ?: "Verification failed")
-        }
-    }
+    override suspend fun sendOtp(email: String): Result<Unit> =
+        Result.Error("OTP login not supported")
+
+    override suspend fun verifyOtp(email: String, otp: String): Result<User> =
+        Result.Error("OTP login not supported")
 
     override suspend fun signInWithEmail(email: String, password: String): Result<User> {
         return try {
@@ -99,8 +106,7 @@ class FirebaseAuthRepository @Inject constructor(
             val result = auth.createUserWithEmailAndPassword(email, password).await()
             val uid = result.user?.uid ?: return Result.Error("Registration failed")
             val user = User(
-                id = uid,
-                email = email,
+                id = uid, email = email,
                 role = UserRole.OWNER,
                 kycStatus = KycStatus.NOT_SUBMITTED,
             )
@@ -113,21 +119,17 @@ class FirebaseAuthRepository @Inject constructor(
 
     override suspend fun submitKyc(userId: String, nicImageUri: String, selfieUri: String): Result<Unit> = try {
         firestore.collection(Constants.COLLECTION_USERS).document(userId)
-            .update(
-                mapOf(
-                    "kycStatus" to KycStatus.PENDING_REVIEW.name,
-                    "nicImageUrl" to nicImageUri,
-                    "selfieUrl" to selfieUri,
-                )
-            ).await()
+            .update(mapOf(
+                "kycStatus"   to KycStatus.PENDING_REVIEW.name,
+                "nicImageUrl" to nicImageUri,
+                "selfieUrl"   to selfieUri,
+            )).await()
         Result.Success(Unit)
     } catch (e: Exception) {
         Result.Error(e.message ?: "KYC submission failed")
     }
 
-    override suspend fun signOut() {
-        auth.signOut()
-    }
+    override suspend fun signOut() { auth.signOut() }
 
     override suspend fun createProfile(user: User): Result<User> = try {
         firestore.collection(Constants.COLLECTION_USERS).document(user.id).set(user).await()
@@ -138,7 +140,7 @@ class FirebaseAuthRepository @Inject constructor(
 
     override suspend fun getProfile(userId: String): Result<User> {
         return try {
-            val doc = firestore.collection(Constants.COLLECTION_USERS).document(userId).get().await()
+            val doc  = firestore.collection(Constants.COLLECTION_USERS).document(userId).get().await()
             val user = doc.toObject(User::class.java) ?: return Result.Error("User not found")
             Result.Success(user)
         } catch (e: Exception) {

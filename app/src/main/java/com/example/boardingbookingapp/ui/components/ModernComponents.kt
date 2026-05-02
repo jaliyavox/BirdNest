@@ -106,7 +106,8 @@ fun ModernTextField(
     isError: Boolean = false,
     errorMessage: String = "",
     leadingIcon: (@Composable () -> Unit)? = null,
-    trailingIcon: (@Composable () -> Unit)? = null
+    trailingIcon: (@Composable () -> Unit)? = null,
+    visualTransformation: androidx.compose.ui.text.input.VisualTransformation = androidx.compose.ui.text.input.VisualTransformation.None,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         if (label.isNotEmpty()) {
@@ -149,7 +150,8 @@ fun ModernTextField(
                             fontSize = 15.sp
                         ),
                         modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
+                        singleLine = true,
+                        visualTransformation = visualTransformation,
                     )
                 }
                 if (trailingIcon != null) {
