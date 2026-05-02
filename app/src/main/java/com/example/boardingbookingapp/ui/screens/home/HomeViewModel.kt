@@ -3,7 +3,9 @@ package com.example.boardingbookingapp.ui.screens.home
 import androidx.lifecycle.ViewModel
 import com.example.boardingbookingapp.data.model.GenderPolicy
 import com.example.boardingbookingapp.data.model.Listing
+import com.example.boardingbookingapp.data.model.PlatformReview
 import com.example.boardingbookingapp.data.model.RoomType
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,8 +13,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor() : ViewModel() {
+class HomeViewModel @Inject constructor(
+    firestore: FirebaseFirestore,
+) : ViewModel() {
 
+    // ── Search / filter (used by ListingsScreen shared ViewModel) ──────
     val searchQuery      = MutableStateFlow("")
     val selectedRoomType = MutableStateFlow<RoomType?>(null)
     val selectedGender   = MutableStateFlow<GenderPolicy?>(null)
@@ -20,20 +25,41 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     private val _filteredListings = MutableStateFlow(MOCK_LISTINGS)
     val filteredListings: StateFlow<List<Listing>> = _filteredListings.asStateFlow()
 
-    fun onSearchChanged(q: String) {
-        searchQuery.value = q
-        applyFilters()
+    // ── Landing page data ──────────────────────────────────────────────
+    val featuredListings: List<Listing> = MOCK_LISTINGS.sortedByDescending { it.averageRating }.take(4)
+
+    val topOwners: List<OwnerSummary> = MOCK_LISTINGS
+        .groupBy { it.ownerId }
+        .map { (_, listings) ->
+            val first = listings.first()
+            OwnerSummary(
+                id           = first.ownerId,
+                name         = first.ownerName,
+                listingCount = listings.size,
+                avgRating    = listings.mapNotNull { it.averageRating.takeIf { r -> r > 0f } }.average().toFloat(),
+            )
+        }
+        .sortedByDescending { it.avgRating }
+        .take(5)
+
+    private val _platformReviews = MutableStateFlow<List<PlatformReview>>(emptyList())
+    val platformReviews: StateFlow<List<PlatformReview>> = _platformReviews.asStateFlow()
+
+    init {
+        firestore.collection("platform_reviews")
+            .whereEqualTo("isApproved", true)
+            .addSnapshotListener { snap, _ ->
+                _platformReviews.value = snap?.documents
+                    ?.mapNotNull { it.toObject(PlatformReview::class.java) }
+                    ?.sortedByDescending { it.createdAt }
+                    ?: emptyList()
+            }
     }
 
-    fun onRoomTypeSelected(rt: RoomType?) {
-        selectedRoomType.value = rt
-        applyFilters()
-    }
-
-    fun onGenderSelected(gp: GenderPolicy?) {
-        selectedGender.value = gp
-        applyFilters()
-    }
+    // ── Filter logic ───────────────────────────────────────────────────
+    fun onSearchChanged(q: String) { searchQuery.value = q; applyFilters() }
+    fun onRoomTypeSelected(rt: RoomType?) { selectedRoomType.value = rt; applyFilters() }
+    fun onGenderSelected(gp: GenderPolicy?) { selectedGender.value = gp; applyFilters() }
 
     private fun applyFilters() {
         val q  = searchQuery.value
@@ -47,6 +73,13 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         }
     }
 }
+
+data class OwnerSummary(
+    val id: String,
+    val name: String,
+    val listingCount: Int,
+    val avgRating: Float,
+)
 
 internal val MOCK_LISTINGS = listOf(
     Listing(

@@ -64,7 +64,6 @@ class FirebaseAuthRepository @Inject constructor(
                 gender = gender,
                 academicYear = academicYear,
                 role = UserRole.STUDENT,
-                isEmailVerified = true,
                 createdAt = System.currentTimeMillis(),
             )
             withTimeout(FIRESTORE_TIMEOUT_MS) {

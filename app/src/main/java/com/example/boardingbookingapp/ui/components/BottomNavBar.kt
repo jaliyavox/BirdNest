@@ -30,7 +30,7 @@ fun BottomNavBar(
     val isOwner = currentUser?.role == UserRole.OWNER
 
     val studentTabs = listOf(
-        Triple("Home",    Icons.Default.Home,                  Screen.StudentDashboard.route),
+        Triple("Home",    Icons.Default.Home,                  Screen.Home.route),
         Triple("Search",  Icons.Default.Search,                Screen.Listings.route),
         Triple("Chat",    Icons.AutoMirrored.Filled.Chat,      Screen.Conversations.route),
         Triple("Profile", Icons.Default.Person,                Screen.Profile.route),

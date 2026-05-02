@@ -16,6 +16,7 @@ import com.example.boardingbookingapp.ui.screens.auth.OwnerLoginScreen
 import com.example.boardingbookingapp.ui.screens.auth.OwnerRegisterScreen
 import com.example.boardingbookingapp.ui.screens.auth.StudentRegisterScreen
 import com.example.boardingbookingapp.ui.screens.auth.WelcomeScreen
+import com.example.boardingbookingapp.ui.screens.review.PlatformReviewScreen
 import com.example.boardingbookingapp.ui.screens.chat.ChatScreen
 import com.example.boardingbookingapp.ui.screens.chat.ConversationsScreen
 import com.example.boardingbookingapp.ui.screens.home.HomeScreen
@@ -44,6 +45,17 @@ fun NavGraph(
 ) {
     val currentUser by UserSession.currentUser.collectAsState()
     val isStudentSignedIn = currentUser?.role == UserRole.STUDENT
+
+    fun NavHostController.navigateAfterLogin() {
+        when (UserSession.currentUser.value?.role) {
+            UserRole.ADMIN -> navigate(Screen.AdminDashboard.route) {
+                popUpTo(Screen.Welcome.route) { inclusive = true }
+            }
+            else -> navigate(Screen.StudentDashboard.route) {
+                popUpTo(Screen.Welcome.route) { inclusive = false }
+            }
+        }
+    }
 
     NavHost(
         navController    = navController,
@@ -97,11 +109,7 @@ fun NavGraph(
         // ── Student login ─────────────────────────────────────────────
         composable(Screen.Login.route) {
             LoginScreen(
-                onLoggedIn = {
-                    navController.navigate(Screen.StudentDashboard.route) {
-                        popUpTo(Screen.Welcome.route) { inclusive = false }
-                    }
-                },
+                onLoggedIn = { navController.navigateAfterLogin() },
                 onNavigateToOwnerLogin = { navController.navigate(Screen.OwnerLogin.route) },
                 onNavigateToRegister   = { navController.navigate(Screen.StudentRegister.route) },
             )
@@ -131,20 +139,21 @@ fun NavGraph(
                 onMessages       = { navController.navigate(Screen.Conversations.route) },
                 onPayments       = { navController.navigate(Screen.RentTracker.route) },
                 onRoommateFinder = { navController.navigate(Screen.RoommateFinder.route) },
-                onSubmitReview   = { navController.navigate(Screen.Listings.route) },
+                onSubmitReview   = { navController.navigate(Screen.PlatformReview.route) },
                 onSupportTicket  = { navController.navigate(Screen.SubmitTicket.route) },
             )
+        }
+
+        composable(Screen.PlatformReview.route) {
+            PlatformReviewScreen(onBack = { navController.popBackStack() })
         }
 
         // ── Browse listings (old home) ────────────────────────────────
         composable(Screen.Home.route) {
             HomeScreen(
-                onListingClick = { id ->
-                    navController.navigate(Screen.ListingDetail.createRoute(id))
-                },
-                onRoommateFinderClick = {
-                    navController.navigate(Screen.RoommateFinder.route)
-                },
+                onListingClick        = { id -> navController.navigate(Screen.ListingDetail.createRoute(id)) },
+                onRoommateFinderClick = { navController.navigate(Screen.RoommateFinder.route) },
+                onBrowseAll           = { navController.navigate(Screen.Listings.route) },
             )
         }
 

@@ -1,33 +1,16 @@
 package com.example.boardingbookingapp.ui.screens.home
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Groups
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -38,41 +21,45 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.boardingbookingapp.data.auth.UserSession
-import com.example.boardingbookingapp.data.model.GenderPolicy
-import com.example.boardingbookingapp.data.model.RoomType
-import com.example.boardingbookingapp.ui.components.*
+import com.example.boardingbookingapp.data.model.Listing
+import com.example.boardingbookingapp.data.model.PlatformReview
+import com.example.boardingbookingapp.ui.components.ModernBackground
+import com.example.boardingbookingapp.ui.components.ModernButton
+import com.example.boardingbookingapp.ui.components.ModernCard
 import com.example.boardingbookingapp.ui.theme.*
+import com.example.boardingbookingapp.util.formatCurrency
 
 @Composable
 fun HomeScreen(
     onListingClick: (String) -> Unit,
     onRoommateFinderClick: () -> Unit,
+    onBrowseAll: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
-    val listings by viewModel.filteredListings.collectAsState()
-    val query by viewModel.searchQuery.collectAsState()
-    val selectedRoomType by viewModel.selectedRoomType.collectAsState()
-    val selectedGender by viewModel.selectedGender.collectAsState()
     val currentUser by UserSession.currentUser.collectAsState()
+    val platformReviews by viewModel.platformReviews.collectAsState()
     val userInitial = currentUser?.firstName?.firstOrNull()?.uppercase()
-        ?: currentUser?.displayName?.firstOrNull()?.uppercase()
-        ?: "?"
+        ?: currentUser?.displayName?.firstOrNull()?.uppercase() ?: "?"
+    val firstName = currentUser?.firstName?.ifBlank { currentUser?.displayName } ?: "Student"
 
     ModernBackground {
-        Column(modifier = Modifier.fillMaxSize()) {
-
-            // Top bar
-            Column(
-                modifier = Modifier
-                    .statusBarsPadding()
-                    .padding(horizontal = 24.dp, vertical = 16.dp),
-            ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding(),
+            contentPadding = PaddingValues(bottom = 100.dp),
+        ) {
+            // ── Header ────────────────────────────────────────────────
+            item {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 20.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -81,24 +68,6 @@ fun HomeScreen(
                         Text("Near SLIIT Malabe", color = ModernTextSecondary, fontSize = 14.sp)
                     }
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        IconButton(
-                            onClick = {},
-                            modifier = Modifier
-                                .size(44.dp)
-                                .clip(CircleShape)
-                                .background(Color.White)
-                        ) {
-                            Box {
-                                Icon(Icons.Default.Notifications, contentDescription = "Notifications", tint = ModernTextPrimary, modifier = Modifier.size(22.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .size(8.dp)
-                                        .clip(CircleShape)
-                                        .background(ModernPrimary)
-                                        .align(Alignment.TopEnd)
-                                )
-                            }
-                        }
                         Box(
                             modifier = Modifier
                                 .size(44.dp)
@@ -110,80 +79,195 @@ fun HomeScreen(
                         }
                     }
                 }
+            }
 
-                Spacer(Modifier.height(24.dp))
-
-                ModernTextField(
-                    value         = query,
-                    onValueChange = { viewModel.onSearchChanged(it) },
-                    label         = "",
-                    placeholder   = "Search by area, title...",
-                    leadingIcon   = {
-                        Icon(Icons.Default.Search, contentDescription = null, tint = ModernTextTertiary, modifier = Modifier.size(20.dp))
-                    },
-                )
-
-                Spacer(Modifier.height(20.dp))
-
-                // Filter chips
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    contentPadding = PaddingValues(bottom = 4.dp)
+            // ── Search bar (tap → go to Listings) ────────────────────
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(Color.White)
+                        .clickable { onBrowseAll() }
+                        .padding(horizontal = 16.dp, vertical = 14.dp),
                 ) {
-                    item {
-                        ModernFilterChip(
-                            label    = "All",
-                            selected = selectedRoomType == null && selectedGender == null,
-                            onClick  = { viewModel.onRoomTypeSelected(null); viewModel.onGenderSelected(null) },
-                        )
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Icon(Icons.Default.Search, null, tint = ModernTextTertiary, modifier = Modifier.size(20.dp))
+                        Text("Search listings, area, type...", color = ModernTextTertiary, fontSize = 15.sp)
                     }
-                    items(RoomType.entries) { rt ->
-                        ModernFilterChip(
-                            label    = rt.name.replace("_", " "),
-                            selected = selectedRoomType == rt,
-                            onClick  = { viewModel.onRoomTypeSelected(if (selectedRoomType == rt) null else rt) },
-                        )
+                }
+                Spacer(Modifier.height(28.dp))
+            }
+
+            // ── Featured Listings ─────────────────────────────────────
+            item {
+                SectionHeader(title = "Featured Near You", actionLabel = "See All", onAction = onBrowseAll)
+                Spacer(Modifier.height(12.dp))
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(14.dp),
+                ) {
+                    items(viewModel.featuredListings, key = { it.id }) { listing ->
+                        FeaturedListingCard(listing = listing, onClick = { onListingClick(listing.id) })
                     }
-                    items(GenderPolicy.entries) { gp ->
-                        ModernFilterChip(
-                            label    = gp.name,
-                            selected = selectedGender == gp,
-                            onClick  = { viewModel.onGenderSelected(if (selectedGender == gp) null else gp) },
-                        )
+                }
+                Spacer(Modifier.height(28.dp))
+            }
+
+            // ── Top Owners ────────────────────────────────────────────
+            item {
+                SectionHeader(title = "Top Owners", actionLabel = null, onAction = {})
+                Spacer(Modifier.height(12.dp))
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    items(viewModel.topOwners, key = { it.id }) { owner ->
+                        OwnerCard(owner = owner)
                     }
+                }
+                Spacer(Modifier.height(28.dp))
+            }
+
+            // ── Platform Reviews ──────────────────────────────────────
+            if (platformReviews.isNotEmpty()) {
+                item {
+                    SectionHeader(title = "What Students Say", actionLabel = null, onAction = {})
+                    Spacer(Modifier.height(12.dp))
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 24.dp),
+                        horizontalArrangement = Arrangement.spacedBy(14.dp),
+                    ) {
+                        items(platformReviews, key = { it.id }) { review ->
+                            ReviewCard(review = review)
+                        }
+                    }
+                    Spacer(Modifier.height(28.dp))
                 }
             }
 
-            // Roommate finder promo card
-            RoommatePromoCard(onClick = onRoommateFinderClick, modifier = Modifier.padding(horizontal = 24.dp))
-            Spacer(Modifier.height(20.dp))
-
-            // Listings
-            if (listings.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("No listings found", color = ModernTextPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                        Spacer(Modifier.height(6.dp))
-                        Text("Try adjusting your filters", color = ModernTextSecondary, fontSize = 14.sp)
+            // ── Roommate finder promo ─────────────────────────────────
+            item {
+                ModernCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp),
+                    onClick = onRoommateFinderClick,
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        Box(
+                            modifier = Modifier
+                                .size(56.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(ModernBlueSoft),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(Icons.Default.Groups, null, tint = ModernPrimary, modifier = Modifier.size(28.dp))
+                        }
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text("Roommate Finder", color = ModernTextPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            Text("Find compatible flatmates near SLIIT", color = ModernTextSecondary, fontSize = 13.sp)
+                        }
+                        Icon(Icons.Default.ChevronRight, null, tint = ModernPrimary, modifier = Modifier.size(20.dp))
                     }
                 }
-            } else {
-                LazyColumn(
-                    contentPadding = PaddingValues(start = 24.dp, end = 24.dp, bottom = 100.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
-                    item {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("${listings.size} Listings", color = ModernTextPrimary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                            Spacer(Modifier.width(8.dp))
-                            Text("found", color = ModernTextSecondary, fontSize = 14.sp)
-                        }
+                Spacer(Modifier.height(20.dp))
+            }
+
+            // ── Browse all CTA ────────────────────────────────────────
+            item {
+                ModernButton(
+                    text     = "Browse All Listings",
+                    onClick  = onBrowseAll,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp),
+                )
+            }
+        }
+    }
+}
+
+// ── Sub-composables ────────────────────────────────────────────────────
+
+@Composable
+private fun SectionHeader(title: String, actionLabel: String?, onAction: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(title, color = ModernTextPrimary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        if (actionLabel != null) {
+            Text(
+                actionLabel,
+                color    = ModernPrimary,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.clickable { onAction() },
+            )
+        }
+    }
+}
+
+@Composable
+private fun FeaturedListingCard(listing: Listing, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .width(220.dp)
+            .clip(RoundedCornerShape(18.dp))
+            .background(Color.White)
+            .clickable { onClick() },
+    ) {
+        Column {
+            // Image placeholder with gradient
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(130.dp)
+                    .background(
+                        Brush.linearGradient(listOf(ModernPrimary.copy(0.7f), ModernBlueSoft))
+                    ),
+                contentAlignment = Alignment.TopEnd,
+            ) {
+                if (listing.isVerified) {
+                    Box(
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(SuccessGreen.copy(0.9f))
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                    ) {
+                        Text("Verified", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                     }
-                    items(listings, key = { it.id }) { listing ->
-                        ListingCard(
-                            listing = listing,
-                            onClick = { onListingClick(listing.id) },
-                        )
+                }
+                // Distance badge bottom-left
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(10.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.Black.copy(alpha = 0.45f))
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                ) {
+                    Text("${listing.distanceFromCampusKm} km", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.SemiBold)
+                }
+            }
+
+            Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(listing.title, color = ModernTextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 17.sp)
+                Text(listing.address, color = ModernTextSecondary, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Spacer(Modifier.height(4.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Text(listing.pricePerMonth.formatCurrency() + "/mo", color = ModernPrimary, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold)
+                    if (listing.averageRating > 0f) {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Icon(Icons.Default.Star, null, tint = Color(0xFFF59E0B), modifier = Modifier.size(13.dp))
+                            Text(String.format("%.1f", listing.averageRating), color = ModernTextSecondary, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                        }
                     }
                 }
             }
@@ -192,26 +276,70 @@ fun HomeScreen(
 }
 
 @Composable
-private fun RoommatePromoCard(onClick: () -> Unit, modifier: Modifier = Modifier) {
-    ModernCard(
-        modifier = modifier.fillMaxWidth(),
-        onClick = onClick
+private fun OwnerCard(owner: OwnerSummary) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.width(80.dp),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            Box(
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(ModernBlueSoft),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(Icons.Default.Groups, contentDescription = null, tint = ModernPrimary, modifier = Modifier.size(28.dp))
+        Box(
+            modifier = Modifier
+                .size(60.dp)
+                .clip(CircleShape)
+                .background(
+                    Brush.linearGradient(listOf(ModernPrimary, ModernBlueSoft))
+                ),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                owner.name.firstOrNull()?.uppercase() ?: "?",
+                color = Color.White,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.ExtraBold,
+            )
+        }
+        Spacer(Modifier.height(6.dp))
+        Text(owner.name.split(" ").firstOrNull() ?: owner.name, color = ModernTextPrimary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text("${owner.listingCount} listing${if (owner.listingCount > 1) "s" else ""}", color = ModernTextSecondary, fontSize = 11.sp)
+        if (owner.avgRating > 0f) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                Icon(Icons.Default.Star, null, tint = Color(0xFFF59E0B), modifier = Modifier.size(11.dp))
+                Text(String.format("%.1f", owner.avgRating), color = ModernTextSecondary, fontSize = 11.sp)
             }
-            Column(modifier = Modifier.weight(1f)) {
-                Text("Roommate Finder", color = ModernTextPrimary, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text("Find compatible flatmates near SLIIT", color = ModernTextSecondary, fontSize = 13.sp)
+        }
+    }
+}
+
+@Composable
+private fun ReviewCard(review: PlatformReview) {
+    Box(
+        modifier = Modifier
+            .width(240.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color.White)
+            .padding(16.dp),
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                repeat(review.rating) {
+                    Icon(Icons.Default.Star, null, tint = Color(0xFFF59E0B), modifier = Modifier.size(14.dp))
+                }
+                repeat(5 - review.rating) {
+                    Icon(Icons.Default.Star, null, tint = ModernTextTertiary.copy(0.3f), modifier = Modifier.size(14.dp))
+                }
             }
-            Icon(Icons.Default.Search, contentDescription = null, tint = ModernPrimary, modifier = Modifier.size(20.dp))
+            Text(review.comment, color = ModernTextPrimary, fontSize = 13.sp, lineHeight = 18.sp, maxLines = 4, overflow = TextOverflow.Ellipsis)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clip(CircleShape)
+                        .background(ModernBlueSoft),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(review.userName.firstOrNull()?.uppercase() ?: "?", color = ModernPrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                }
+                Text(review.userName, color = ModernTextSecondary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+            }
         }
     }
 }

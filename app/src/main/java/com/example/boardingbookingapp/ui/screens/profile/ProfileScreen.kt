@@ -47,7 +47,6 @@ fun ProfileScreen(
         UserRole.ADMIN -> "ADMIN"
         else -> "STUDENT"
     }
-    val isVerified = user?.isEmailVerified == true
 
     ModernBackground {
         LazyColumn(
@@ -75,10 +74,7 @@ fun ProfileScreen(
                         Text(email, color = ModernTextSecondary, fontSize = 14.sp)
                         Spacer(Modifier.height(12.dp))
 
-                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
-                            ModernBadge(roleLabel, ModernPrimary)
-                            if (isVerified) ModernBadge("VERIFIED", SuccessGreen)
-                        }
+                        ModernBadge(roleLabel, ModernPrimary)
 
                         if (user?.academicYear != null && user!!.academicYear > 0) {
                             Spacer(Modifier.height(12.dp))

@@ -13,6 +13,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,13 +26,17 @@ import com.example.boardingbookingapp.ui.components.*
 import com.example.boardingbookingapp.ui.theme.*
 
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.boardingbookingapp.data.model.PlatformReview
 
-private val TABS = listOf("Listings", "Users", "Feedback", "Support")
+private val TABS = listOf("Listings", "Users", "Reviews", "Feedback", "Support")
 
 @Composable
 fun AdminDashboardScreen(
     onBack: () -> Unit,
+    viewModel: AdminViewModel = hiltViewModel(),
 ) {
+    val reviews by viewModel.reviews.collectAsState()
     var selectedTab by remember { mutableIntStateOf(0) }
 
     ModernBackground {
@@ -96,8 +101,9 @@ fun AdminDashboardScreen(
             when (selectedTab) {
                 0 -> ListingsTab()
                 1 -> UsersTab()
-                2 -> FeedbackTab()
-                3 -> TicketsTab()
+                2 -> ReviewsTab(reviews = reviews, onApprove = viewModel::approveReview, onDelete = viewModel::deleteReview)
+                3 -> FeedbackTab()
+                4 -> TicketsTab()
             }
         }
     }
@@ -177,6 +183,43 @@ private fun UsersTab() {
 }
 
 @Composable
+private fun ReviewsTab(
+    reviews: List<PlatformReview>,
+    onApprove: (String) -> Unit,
+    onDelete: (String) -> Unit,
+) {
+    if (reviews.isEmpty()) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("No reviews yet", color = ModernTextSecondary, fontSize = 16.sp)
+        }
+        return
+    }
+    LazyColumn(contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        items(reviews, key = { it.id }) { review ->
+            val stars = "★".repeat(review.rating) + "☆".repeat(5 - review.rating)
+            AdminActionCard(
+                icon       = Icons.Default.Star,
+                iconColor  = if (review.isApproved) SuccessGreen else WarningAmber,
+                title      = "${review.userName}  $stars",
+                subtitle   = review.comment,
+                status     = if (review.isApproved) "APPROVED" else "PENDING",
+                statusColor = if (review.isApproved) SuccessGreen else WarningAmber,
+                actions    = if (review.isApproved)
+                    listOf("Delete" to ErrorRed)
+                else
+                    listOf("Approve" to SuccessGreen, "Delete" to ErrorRed),
+                onAction   = { label ->
+                    when (label) {
+                        "Approve" -> onApprove(review.id)
+                        "Delete"  -> onDelete(review.id)
+                    }
+                },
+            )
+        }
+    }
+}
+
+@Composable
 private fun FeedbackTab() {
     val feedbacks = listOf(
         Triple("Great app! But needs better search filters.", "Kasun Perera", "Feature Request"),
@@ -228,6 +271,7 @@ private fun AdminActionCard(
     status: String,
     statusColor: Color,
     actions: List<Pair<String, Color>>,
+    onAction: (String) -> Unit = {},
 ) {
     ModernCard(modifier = Modifier.fillMaxWidth()) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -263,7 +307,7 @@ private fun AdminActionCard(
                                 .weight(1f)
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(color.copy(alpha = 0.1f))
-                                .clickable {}
+                                .clickable { onAction(label) }
                                 .padding(vertical = 10.dp),
                             contentAlignment = Alignment.Center
                         ) {
