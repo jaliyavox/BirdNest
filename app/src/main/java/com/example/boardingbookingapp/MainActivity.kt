@@ -33,8 +33,9 @@ class MainActivity : ComponentActivity() {
                 val navBackStack by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStack?.destination?.route
 
+                // Bottom bar is shown on all main tab screens but NOT on StudentDashboard
+                // (StudentDashboard is the post-login entry hub, not a tab itself)
                 val bottomBarRoutes = setOf(
-                    Screen.StudentDashboard.route,
                     Screen.Home.route,
                     Screen.Listings.route,
                     Screen.Conversations.route,
@@ -55,7 +56,10 @@ class MainActivity : ComponentActivity() {
                             currentRoute = currentRoute ?: "",
                             onTabSelected = { route ->
                                 navController.navigate(route) {
-                                    popUpTo(Screen.Home.route) { saveState = true }
+                                    // Use StudentDashboard as anchor — the true root after login.
+                                    // This ensures ALL tab-level back stack entries are cleared
+                                    // and state is saved/restored correctly when switching tabs.
+                                    popUpTo(Screen.StudentDashboard.route) { saveState = true }
                                     launchSingleTop = true
                                     restoreState = true
                                 }

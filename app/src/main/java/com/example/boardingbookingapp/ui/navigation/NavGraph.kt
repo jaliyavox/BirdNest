@@ -153,7 +153,15 @@ fun NavGraph(
             HomeScreen(
                 onListingClick        = { id -> navController.navigate(Screen.ListingDetail.createRoute(id)) },
                 onRoommateFinderClick = { navController.navigate(Screen.RoommateFinder.route) },
-                onBrowseAll           = { navController.navigate(Screen.Listings.route) },
+                onBrowseAll           = {
+                    // Navigate as a tab switch so the back stack stays clean.
+                    // Tapping the Home tab from Listings will correctly return here.
+                    navController.navigate(Screen.Listings.route) {
+                        popUpTo(Screen.StudentDashboard.route) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
             )
         }
 
