@@ -28,7 +28,6 @@ import com.example.boardingbookingapp.ui.screens.onboarding.OnboardingScreen
 import com.example.boardingbookingapp.ui.screens.payment.ReceiptUploadScreen
 import com.example.boardingbookingapp.ui.screens.payment.RentTrackerScreen
 import com.example.boardingbookingapp.ui.screens.profile.ProfileScreen
-import com.example.boardingbookingapp.ui.screens.profile.SubmitFeedbackScreen
 import com.example.boardingbookingapp.ui.screens.profile.SubmitTicketScreen
 import com.example.boardingbookingapp.ui.screens.roommate.RoommateFinderScreen
 import com.example.boardingbookingapp.ui.screens.roommate.RoommateProfileScreen
@@ -36,7 +35,10 @@ import com.example.boardingbookingapp.ui.screens.splash.SplashScreen
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.example.boardingbookingapp.data.auth.UserSession
+import com.example.boardingbookingapp.data.model.KycStatus
 import com.example.boardingbookingapp.data.model.UserRole
+import com.example.boardingbookingapp.ui.screens.owner.OwnerDashboardScreen
+import com.example.boardingbookingapp.ui.screens.owner.OwnerManagementScreen
 
 @Composable
 fun NavGraph(
@@ -47,9 +49,18 @@ fun NavGraph(
     val isStudentSignedIn = currentUser?.role == UserRole.STUDENT
 
     fun NavHostController.navigateAfterLogin() {
-        when (UserSession.currentUser.value?.role) {
+        val user = UserSession.currentUser.value
+        when (user?.role) {
             UserRole.ADMIN -> navigate(Screen.AdminDashboard.route) {
                 popUpTo(Screen.Welcome.route) { inclusive = true }
+            }
+            UserRole.OWNER -> {
+                val dest = when (user.kycStatus) {
+                    KycStatus.APPROVED -> Screen.OwnerDashboard.route
+                    KycStatus.PENDING_REVIEW -> Screen.KycPending.route
+                    else -> Screen.KycUpload.route
+                }
+                navigate(dest) { popUpTo(Screen.Welcome.route) { inclusive = false } }
             }
             else -> navigate(Screen.StudentDashboard.route) {
                 popUpTo(Screen.Welcome.route) { inclusive = false }
@@ -244,18 +255,17 @@ fun NavGraph(
         composable(Screen.Profile.route) {
             ProfileScreen(
                 onSignOut = {
+                    UserSession.signOut()
                     navController.navigate(Screen.Welcome.route) {
                         popUpTo(0) { inclusive = true }
                     }
                 },
                 onOpenRentTracker = { navController.navigate(Screen.RentTracker.route) },
-                onSubmitFeedback  = { navController.navigate(Screen.SubmitFeedback.route) },
+                onPlatformReview  = { navController.navigate(Screen.PlatformReview.route) },
                 onSubmitTicket    = { navController.navigate(Screen.SubmitTicket.route) },
+                onMyListings      = { navController.navigate(Screen.Home.route) },
+                onPostListing     = { navController.navigate(Screen.PostListing.route) },
             )
-        }
-
-        composable(Screen.SubmitFeedback.route) {
-            SubmitFeedbackScreen(onBack = { navController.popBackStack() })
         }
 
         composable(Screen.SubmitTicket.route) {
@@ -265,13 +275,9 @@ fun NavGraph(
         // ── Owner flow ────────────────────────────────────────────────
         composable(Screen.OwnerLogin.route) {
             OwnerLoginScreen(
-                onLoggedIn            = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Welcome.route) { inclusive = false }
-                    }
-                },
-                onNavigateToRegister  = { navController.navigate(Screen.OwnerRegister.route) },
-                onBack                = { navController.popBackStack() },
+                onLoggedIn           = { navController.navigateAfterLogin() },
+                onNavigateToRegister = { navController.navigate(Screen.OwnerRegister.route) },
+                onBack               = { navController.popBackStack() },
             )
         }
 
@@ -300,7 +306,7 @@ fun NavGraph(
         composable(Screen.KycPending.route) {
             KycPendingScreen(
                 onApproved = {
-                    navController.navigate(Screen.Home.route) {
+                    navController.navigate(Screen.OwnerDashboard.route) {
                         popUpTo(Screen.Welcome.route) { inclusive = false }
                     }
                 },
@@ -310,6 +316,28 @@ fun NavGraph(
         // ── Admin (separate entry point) ──────────────────────────────
         composable(Screen.AdminDashboard.route) {
             AdminDashboardScreen(onBack = { navController.popBackStack() })
+        }
+
+        // ── Owner Dashboard ───────────────────────────────────────────
+        composable(Screen.OwnerDashboard.route) {
+            OwnerDashboardScreen(
+                onAddListing    = { navController.navigate(Screen.PostListing.route) },
+                onMyListings    = { navController.navigate(Screen.Home.route) },
+                onMessages      = { navController.navigate(Screen.Conversations.route) },
+                onBrowse        = { navController.navigate(Screen.Listings.route) },
+                onProfile       = { navController.navigate(Screen.Profile.route) },
+                onManagement    = { navController.navigate(Screen.OwnerManagement.route) },
+                onSignOut       = {
+                    UserSession.signOut()
+                    navController.navigate(Screen.Welcome.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+            )
+        }
+
+        composable(Screen.OwnerManagement.route) {
+            OwnerManagementScreen(onBack = { navController.popBackStack() })
         }
     }
 }

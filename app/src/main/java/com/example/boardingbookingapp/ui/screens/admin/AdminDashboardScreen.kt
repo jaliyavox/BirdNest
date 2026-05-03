@@ -1,7 +1,6 @@
 package com.example.boardingbookingapp.ui.screens.admin
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,7 +12,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,22 +20,30 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.boardingbookingapp.ui.components.*
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.boardingbookingapp.data.model.KycStatus
+import com.example.boardingbookingapp.data.model.Listing
+import com.example.boardingbookingapp.data.model.PlatformReview
+import com.example.boardingbookingapp.data.model.User
+import com.example.boardingbookingapp.data.model.UserRole
+import com.example.boardingbookingapp.ui.components.ModernBackground
+import com.example.boardingbookingapp.ui.components.ModernCard
 import com.example.boardingbookingapp.ui.theme.*
 
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.boardingbookingapp.data.model.PlatformReview
-
-private val TABS = listOf("Listings", "Users", "Reviews", "Feedback", "Support")
+private val TABS = listOf("Listings", "Users", "KYC", "Reviews", "Feedback", "Support")
 
 @Composable
 fun AdminDashboardScreen(
     onBack: () -> Unit,
     viewModel: AdminViewModel = hiltViewModel(),
 ) {
-    val reviews by viewModel.reviews.collectAsState()
+    val reviews  by viewModel.reviews.collectAsState()
+    val users    by viewModel.users.collectAsState()
+    val listings by viewModel.listings.collectAsState()
     var selectedTab by remember { mutableIntStateOf(0) }
+
+    val pendingKyc      = users.count { it.kycStatus == KycStatus.PENDING_REVIEW }
+    val pendingListings = listings.count { !it.isVerified }
 
     ModernBackground {
         Column(
@@ -69,28 +75,28 @@ fun AdminDashboardScreen(
                     .padding(horizontal = 24.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                SummaryBox("12", "Pending", WarningAmber, Modifier.weight(1f))
-                SummaryBox("3", "Queue", ModernPrimary, Modifier.weight(1f))
-                SummaryBox("48", "Users", SuccessGreen, Modifier.weight(1f))
+                SummaryBox("$pendingListings", "Pending", WarningAmber, Modifier.weight(1f))
+                SummaryBox("$pendingKyc", "KYC", ModernPrimary, Modifier.weight(1f))
+                SummaryBox("${users.size}", "Users", SuccessGreen, Modifier.weight(1f))
             }
 
             Spacer(Modifier.height(16.dp))
 
             SecondaryTabRow(
                 selectedTabIndex = selectedTab,
-                containerColor  = Color.White,
-                contentColor    = ModernPrimary,
+                containerColor = Color.White,
+                contentColor = ModernPrimary,
                 divider = { HorizontalDivider(color = ModernTextTertiary.copy(alpha = 0.1f)) }
             ) {
                 TABS.forEachIndexed { i, title ->
                     Tab(
                         selected = selectedTab == i,
-                        onClick  = { selectedTab = i },
+                        onClick = { selectedTab = i },
                         text = {
                             Text(
                                 title,
-                                color     = if (selectedTab == i) ModernPrimary else ModernTextSecondary,
-                                fontSize  = 13.sp,
+                                color = if (selectedTab == i) ModernPrimary else ModernTextSecondary,
+                                fontSize = 13.sp,
                                 fontWeight = if (selectedTab == i) FontWeight.Bold else FontWeight.Medium,
                             )
                         },
@@ -99,11 +105,28 @@ fun AdminDashboardScreen(
             }
 
             when (selectedTab) {
-                0 -> ListingsTab()
-                1 -> UsersTab()
-                2 -> ReviewsTab(reviews = reviews, onApprove = viewModel::approveReview, onDelete = viewModel::deleteReview)
-                3 -> FeedbackTab()
-                4 -> TicketsTab()
+                0 -> ListingsTab(
+                    listings = listings,
+                    onApprove = viewModel::approveListing,
+                    onRemove = viewModel::removeListing,
+                )
+                1 -> UsersTab(
+                    users = users,
+                    onBan = { uid -> viewModel.banUser(uid, true) },
+                    onUnban = { uid -> viewModel.banUser(uid, false) },
+                )
+                2 -> KycTab(
+                    pendingUsers = users.filter { it.kycStatus == KycStatus.PENDING_REVIEW },
+                    onApprove = viewModel::approveKyc,
+                    onReject = viewModel::rejectKyc,
+                )
+                3 -> ReviewsTab(
+                    reviews = reviews,
+                    onApprove = viewModel::approveReview,
+                    onDelete = viewModel::deleteReview,
+                )
+                4 -> FeedbackTab()
+                5 -> TicketsTab()
             }
         }
     }
@@ -125,62 +148,230 @@ private fun SummaryBox(value: String, label: String, color: Color, modifier: Mod
     }
 }
 
+// ── Listings Tab ─────────────────────────────────────────────────────────────
+
 @Composable
-private fun ListingsTab() {
-    val items = listOf(
-        Triple("Modern Furnished Room", "Nimali Fernando", false),
-        Triple("Whole House for 4 Students", "Ishara Jayawardena", false),
-        Triple("Budget Room Near Gate", "Saman Kumara", true),
-    )
-    LazyColumn(contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        items(items) { (title, owner, approved) ->
+private fun ListingsTab(
+    listings: List<Listing>,
+    onApprove: (String) -> Unit,
+    onRemove: (String) -> Unit,
+) {
+    var confirmRemove by remember { mutableStateOf<Listing?>(null) }
+
+    confirmRemove?.let { listing ->
+        AlertDialog(
+            onDismissRequest = { confirmRemove = null },
+            title = { Text("Remove Listing") },
+            text = { Text("Permanently remove \"${listing.title}\"? This cannot be undone.") },
+            confirmButton = {
+                Button(
+                    onClick = { onRemove(listing.id); confirmRemove = null },
+                    colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)
+                ) { Text("Remove") }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmRemove = null }) { Text("Cancel") }
+            }
+        )
+    }
+
+    if (listings.isEmpty()) {
+        EmptyState(Icons.Default.Home, "No listings yet")
+        return
+    }
+
+    LazyColumn(
+        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(listings, key = { it.id }) { listing ->
             AdminActionCard(
-                icon     = Icons.Default.Home,
-                iconColor = if (approved) SuccessGreen else WarningAmber,
-                title    = title,
-                subtitle = "Owner: $owner",
-                status    = if (approved) "LIVE" else "PENDING",
-                statusColor = if (approved) SuccessGreen else WarningAmber,
-                actions  = if (!approved) listOf("Approve" to ModernPrimary, "Reject" to ErrorRed) else listOf("Revoke" to ErrorRed),
+                icon = Icons.Default.Home,
+                iconColor = if (listing.isVerified) SuccessGreen else WarningAmber,
+                title = listing.title.ifBlank { "Untitled" },
+                subtitle = "Owner: ${listing.ownerName} · Rs ${listing.pricePerMonth}/mo",
+                status = if (listing.isVerified) "LIVE" else "PENDING",
+                statusColor = if (listing.isVerified) SuccessGreen else WarningAmber,
+                actions = buildList {
+                    if (!listing.isVerified) add("Approve" to ModernPrimary)
+                    add("Remove" to ErrorRed)
+                },
+                onAction = { label ->
+                    when (label) {
+                        "Approve" -> onApprove(listing.id)
+                        "Remove"  -> confirmRemove = listing
+                    }
+                }
             )
         }
     }
 }
 
+// ── Users Tab ────────────────────────────────────────────────────────────────
+
 @Composable
-private fun UsersTab() {
-    val users = listOf(
-        Triple("Nimali Fernando", "owner@example.com", "KYC Pending"),
-        Triple("Kasun Perera", "kasun@my.sliit.lk", "Active"),
-        Triple("Amaya Jayasinghe", "amaya@my.sliit.lk", "Active"),
-        Triple("Bad Actor", "bad@example.com", "Suspended"),
-    )
-    LazyColumn(contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        items(users) { (name, email, status) ->
+private fun UsersTab(
+    users: List<User>,
+    onBan: (String) -> Unit,
+    onUnban: (String) -> Unit,
+) {
+    var confirmBan   by remember { mutableStateOf<User?>(null) }
+    var confirmUnban by remember { mutableStateOf<User?>(null) }
+
+    confirmBan?.let { user ->
+        val name = user.displayName.ifBlank { user.firstName }.ifBlank { "User" }
+        AlertDialog(
+            onDismissRequest = { confirmBan = null },
+            title = { Text("Ban User") },
+            text = { Text("Ban $name? They will not be able to log in.") },
+            confirmButton = {
+                Button(
+                    onClick = { onBan(user.id); confirmBan = null },
+                    colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)
+                ) { Text("Ban") }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmBan = null }) { Text("Cancel") }
+            }
+        )
+    }
+
+    confirmUnban?.let { user ->
+        val name = user.displayName.ifBlank { user.firstName }.ifBlank { "User" }
+        AlertDialog(
+            onDismissRequest = { confirmUnban = null },
+            title = { Text("Restore Account") },
+            text = { Text("Restore access for $name?") },
+            confirmButton = {
+                Button(
+                    onClick = { onUnban(user.id); confirmUnban = null },
+                    colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen)
+                ) { Text("Restore") }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmUnban = null }) { Text("Cancel") }
+            }
+        )
+    }
+
+    val nonAdminUsers = users.filter { it.role != UserRole.ADMIN }
+    if (nonAdminUsers.isEmpty()) {
+        EmptyState(Icons.Default.People, "No users yet")
+        return
+    }
+
+    LazyColumn(
+        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(nonAdminUsers, key = { it.id }) { user ->
+            val name = user.displayName.ifBlank { "${user.firstName} ${user.lastName}".trim() }.ifBlank { "Unknown" }
+            val active = user.isActive
             AdminActionCard(
-                icon      = Icons.Default.Person,
-                iconColor = when (status) {
-                    "Active"      -> SuccessGreen
-                    "KYC Pending" -> WarningAmber
-                    else          -> ErrorRed
+                icon = Icons.Default.Person,
+                iconColor = when {
+                    !active -> ErrorRed
+                    user.kycStatus == KycStatus.PENDING_REVIEW -> WarningAmber
+                    else -> SuccessGreen
                 },
-                title    = name,
-                subtitle = email,
-                status    = status.uppercase(),
-                statusColor = when (status) {
-                    "Active"      -> SuccessGreen
-                    "KYC Pending" -> WarningAmber
-                    else          -> ErrorRed
-                },
-                actions  = when (status) {
-                    "KYC Pending" -> listOf("Verify" to ModernPrimary, "Deny" to ErrorRed)
-                    "Suspended"   -> listOf("Restore" to SuccessGreen)
-                    else          -> listOf("Suspend" to ErrorRed)
-                },
+                title = name,
+                subtitle = "${user.role.name} · ${user.email}",
+                status = if (active) "ACTIVE" else "BANNED",
+                statusColor = if (active) SuccessGreen else ErrorRed,
+                actions = if (active) listOf("Ban" to ErrorRed) else listOf("Restore" to SuccessGreen),
+                onAction = { label ->
+                    when (label) {
+                        "Ban"     -> confirmBan = user
+                        "Restore" -> confirmUnban = user
+                    }
+                }
             )
         }
     }
 }
+
+// ── KYC Tab ──────────────────────────────────────────────────────────────────
+
+@Composable
+private fun KycTab(
+    pendingUsers: List<User>,
+    onApprove: (String) -> Unit,
+    onReject: (String, String) -> Unit,
+) {
+    var rejectingUser  by remember { mutableStateOf<User?>(null) }
+    var rejectionReason by remember { mutableStateOf("") }
+
+    rejectingUser?.let { user ->
+        val name = user.displayName.ifBlank { user.firstName }.ifBlank { "Owner" }
+        AlertDialog(
+            onDismissRequest = { rejectingUser = null; rejectionReason = "" },
+            title = { Text("Reject KYC") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Enter rejection reason for $name:")
+                    OutlinedTextField(
+                        value = rejectionReason,
+                        onValueChange = { rejectionReason = it },
+                        placeholder = { Text("e.g. NIC image is unclear", fontSize = 13.sp) },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 3,
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        onReject(user.id, rejectionReason)
+                        rejectingUser = null
+                        rejectionReason = ""
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = ErrorRed),
+                    enabled = rejectionReason.isNotBlank(),
+                ) { Text("Reject") }
+            },
+            dismissButton = {
+                TextButton(onClick = { rejectingUser = null; rejectionReason = "" }) { Text("Cancel") }
+            }
+        )
+    }
+
+    if (pendingUsers.isEmpty()) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Icon(Icons.Default.CheckCircle, null, tint = SuccessGreen, modifier = Modifier.size(48.dp))
+                Text("All KYC requests reviewed", color = ModernTextSecondary, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                Text("No pending owner verifications", color = ModernTextTertiary, fontSize = 13.sp)
+            }
+        }
+        return
+    }
+
+    LazyColumn(
+        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(pendingUsers, key = { it.id }) { user ->
+            val name = user.displayName.ifBlank { "${user.firstName} ${user.lastName}".trim() }.ifBlank { "Owner" }
+            AdminActionCard(
+                icon = Icons.Default.VerifiedUser,
+                iconColor = WarningAmber,
+                title = name,
+                subtitle = user.email,
+                status = "KYC PENDING",
+                statusColor = WarningAmber,
+                actions = listOf("Approve" to SuccessGreen, "Reject" to ErrorRed),
+                onAction = { label ->
+                    when (label) {
+                        "Approve" -> onApprove(user.id)
+                        "Reject"  -> rejectingUser = user
+                    }
+                }
+            )
+        }
+    }
+}
+
+// ── Reviews Tab ──────────────────────────────────────────────────────────────
 
 @Composable
 private fun ReviewsTab(
@@ -189,26 +380,27 @@ private fun ReviewsTab(
     onDelete: (String) -> Unit,
 ) {
     if (reviews.isEmpty()) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("No reviews yet", color = ModernTextSecondary, fontSize = 16.sp)
-        }
+        EmptyState(Icons.Default.Star, "No reviews yet")
         return
     }
-    LazyColumn(contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    LazyColumn(
+        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
         items(reviews, key = { it.id }) { review ->
             val stars = "★".repeat(review.rating) + "☆".repeat(5 - review.rating)
             AdminActionCard(
-                icon       = Icons.Default.Star,
-                iconColor  = if (review.isApproved) SuccessGreen else WarningAmber,
-                title      = "${review.userName}  $stars",
-                subtitle   = review.comment,
-                status     = if (review.isApproved) "APPROVED" else "PENDING",
+                icon = Icons.Default.Star,
+                iconColor = if (review.isApproved) SuccessGreen else WarningAmber,
+                title = "${review.userName}  $stars",
+                subtitle = review.comment,
+                status = if (review.isApproved) "APPROVED" else "PENDING",
                 statusColor = if (review.isApproved) SuccessGreen else WarningAmber,
-                actions    = if (review.isApproved)
+                actions = if (review.isApproved)
                     listOf("Delete" to ErrorRed)
                 else
                     listOf("Approve" to SuccessGreen, "Delete" to ErrorRed),
-                onAction   = { label ->
+                onAction = { label ->
                     when (label) {
                         "Approve" -> onApprove(review.id)
                         "Delete"  -> onDelete(review.id)
@@ -219,45 +411,28 @@ private fun ReviewsTab(
     }
 }
 
+// ── Feedback Tab (stub) ───────────────────────────────────────────────────────
+
 @Composable
 private fun FeedbackTab() {
-    val feedbacks = listOf(
-        Triple("Great app! But needs better search filters.", "Kasun Perera", "Feature Request"),
-        Triple("Owner didn't respond for 3 days.", "Amaya Silva", "Complaint"),
-        Triple("Found my boarding house within a week!", "Tharaka B.", "Praise"),
-    )
-    LazyColumn(contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        items(feedbacks) { (msg, user, category) ->
-            AdminActionCard(
-                icon      = Icons.Default.Feedback,
-                iconColor = ModernPrimary,
-                title    = user,
-                subtitle = msg,
-                status    = category.uppercase(),
-                statusColor = ModernPrimary,
-                actions  = listOf("Reply" to ModernPrimary, "Resolve" to SuccessGreen),
-            )
-        }
-    }
+    EmptyState(Icons.Default.Feedback, "No feedback yet")
 }
+
+// ── Tickets Tab (stub) ────────────────────────────────────────────────────────
 
 @Composable
 private fun TicketsTab() {
-    val tickets = listOf(
-        Triple("Cannot upload profile photo", "Dilini Silva", "OPEN"),
-        Triple("Room marked occupied but isn't", "Nuwan R.", "IN PROGRESS"),
-    )
-    LazyColumn(contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        items(tickets) { (issue, user, status) ->
-            AdminActionCard(
-                icon      = Icons.Default.SupportAgent,
-                iconColor = WarningAmber,
-                title    = user,
-                subtitle = issue,
-                status    = status,
-                statusColor = if (status == "OPEN") WarningAmber else ModernPrimary,
-                actions  = if (status == "OPEN") listOf("Start" to ModernPrimary) else listOf("Close" to SuccessGreen),
-            )
+    EmptyState(Icons.Default.SupportAgent, "No support tickets")
+}
+
+// ── Shared Composables ────────────────────────────────────────────────────────
+
+@Composable
+private fun EmptyState(icon: ImageVector, message: String) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Icon(icon, null, tint = ModernTextTertiary, modifier = Modifier.size(48.dp))
+            Text(message, color = ModernTextSecondary, fontSize = 16.sp)
         }
     }
 }

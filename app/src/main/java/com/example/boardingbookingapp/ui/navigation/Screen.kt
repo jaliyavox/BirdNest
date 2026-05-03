@@ -30,6 +30,8 @@ sealed class Screen(val route: String) {
     data object RentTracker     : Screen("rent_tracker")
     data object Profile         : Screen("profile")
     data object AdminDashboard  : Screen("admin")
+    data object OwnerDashboard      : Screen("owner_dashboard")
+    data object OwnerManagement     : Screen("owner_management")
     data object ReceiptUpload  : Screen("receipt_upload")
     data object SubmitFeedback   : Screen("submit_feedback")
     data object SubmitTicket     : Screen("submit_ticket")

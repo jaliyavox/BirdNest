@@ -1,7 +1,6 @@
 package com.example.boardingbookingapp.ui.screens.listings
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,17 +11,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddPhotoAlternate
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,9 +26,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.boardingbookingapp.data.model.GenderPolicy
 import com.example.boardingbookingapp.data.model.RoomType
 import com.example.boardingbookingapp.ui.components.*
+import com.example.boardingbookingapp.ui.screens.owner.OwnerViewModel
+import com.example.boardingbookingapp.ui.screens.owner.PostState
 import com.example.boardingbookingapp.ui.theme.*
 
 private val STEPS = listOf("Photos", "Details", "Amenities", "Location", "Review")
@@ -45,6 +41,7 @@ private val ALL_AMENITIES = listOf("WiFi", "AC", "Fan", "Hot Water", "Parking", 
 fun PostListingScreen(
     onListingPosted: () -> Unit,
     onBack: () -> Unit,
+    viewModel: OwnerViewModel = hiltViewModel(),
 ) {
     var step by remember { mutableIntStateOf(0) }
     var title by remember { mutableStateOf("") }
@@ -55,6 +52,15 @@ fun PostListingScreen(
     var selectedAmenities by remember { mutableStateOf(setOf<String>()) }
     var address by remember { mutableStateOf("") }
     var photosAdded by remember { mutableIntStateOf(0) }
+
+    val postState by viewModel.postState.collectAsState()
+
+    LaunchedEffect(postState) {
+        if (postState is PostState.Success) {
+            viewModel.resetPostState()
+            onListingPosted()
+        }
+    }
 
     ModernBackground {
         Column(
@@ -156,8 +162,23 @@ fun PostListingScreen(
                     }
                     ModernButton(
                         text    = if (step < STEPS.lastIndex) "Next Step" else "Submit Listing",
-                        onClick = { if (step < STEPS.lastIndex) step++ else onListingPosted() },
+                        onClick = {
+                            if (step < STEPS.lastIndex) {
+                                step++
+                            } else {
+                                viewModel.postListing(
+                                    title         = title.trim(),
+                                    description   = description.trim(),
+                                    price         = price.toIntOrNull() ?: 0,
+                                    roomType      = selectedRoomType ?: RoomType.SINGLE,
+                                    genderPolicy  = selectedGenderPolicy ?: GenderPolicy.MIXED,
+                                    amenities     = selectedAmenities.toList(),
+                                    address       = address.trim(),
+                                )
+                            }
+                        },
                         modifier = Modifier.weight(1f),
+                        isLoading = postState is PostState.Loading,
                         enabled = when (step) {
                             0 -> photosAdded > 0
                             1 -> title.isNotBlank() && price.isNotBlank() && selectedRoomType != null
@@ -165,6 +186,14 @@ fun PostListingScreen(
                             else -> true
                         },
                     )
+                    if (postState is PostState.Error) {
+                        Text(
+                            text = (postState as PostState.Error).message,
+                            color = ErrorRed,
+                            fontSize = 12.sp,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
             }
         }

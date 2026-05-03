@@ -50,8 +50,10 @@
 - [ ] Support ticket submission (connect to Firestore)
 
 ## Sprint 4 — Owner Sign-Up Flow
-- [ ] (Ask before starting) Owner registration with KYC
-- [ ] Owner dashboard
+- [x] Owner registration with KYC (email/password, no OTP)
+- [x] Owner dashboard (action cards: Add Listing, My Listings, Messages, Browse, Profile)
+- [x] Owner can post listings (Firestore save wired to OwnerViewModel)
+- [x] Route OWNER role to OwnerDashboard after login (KYC-status aware routing)
 
 ## Sprint 5 — Admin Panel (separate)
 - [ ] Admin dashboard (separate from student/owner flow)
@@ -68,9 +70,9 @@
 - [x] `AdminViewModel.approveReview(id)` — sets `isApproved = true` in Firestore
 - [x] `AdminViewModel.deleteReview(id)` — deletes document from Firestore
 - [x] Update `AdminDashboardScreen` — add Reviews tab with live Approve/Delete actions
-- [ ] Android: Admin can approve/reject owner KYC from in-app admin screen
-- [ ] Android: Admin can ban/unban users from in-app admin screen
-- [ ] Android: Admin can remove inappropriate listings from in-app admin screen
+- [x] Android: Admin can approve/reject owner KYC from in-app admin screen
+- [x] Android: Admin can ban/unban users from in-app admin screen
+- [x] Android: Admin can remove inappropriate listings from in-app admin screen
 
 ### Web Admin Panel (`admin-panel/index.html`)
 - [x] Single HTML file — no build step, open directly in browser
@@ -94,41 +96,41 @@
 - [x] Filter by role and status (active/banned)
 - [x] Table with user details
 - [x] Ban / Unban action (with confirmation modal)
-- [ ] View full user profile details from admin panel
-- [ ] Bulk ban/export selected users
+- [x] View full user profile details from admin panel
+- [x] Bulk ban/export selected users
 
 #### Listings Section
 - [x] Table with listing title, owner, price, status
 - [x] Approve listing action
 - [x] Remove inappropriate listing (with confirmation modal)
-- [ ] Preview listing details in a modal
-- [ ] Filter listings by status (pending / approved / removed)
+- [x] Preview listing details in a modal
+- [x] Filter listings by status (pending / approved / removed)
 
 #### Reviews Section
 - [x] Grid cards showing pending reviews (Approve / Delete)
 - [x] Grid cards showing approved reviews (Delete)
 - [x] Real-time updates via Firestore snapshot
-- [ ] Filter reviews by rating
-- [ ] Reply/note field for admin on reviews
+- [x] Filter reviews by rating
+- [x] Reply/note field for admin on reviews
 
 #### KYC Section
 - [x] Cards for owners with PENDING_REVIEW status
 - [x] NIC/selfie document links
 - [x] Approve KYC action (sets status to APPROVED in Firestore)
 - [x] Reject KYC action (sets status to REJECTED in Firestore)
-- [ ] Show rejection reason input before rejecting
-- [ ] Notify owner via Firestore flag when KYC is approved/rejected
+- [x] Show rejection reason input before rejecting
+- [x] Notify owner via Firestore flag when KYC is approved/rejected
 
 #### Support Tickets Section
 - [x] Table with ticket title, student, status, created date
 - [x] Status flow: Open → In Progress → Resolved → Delete
-- [ ] View full ticket message in a modal
-- [ ] Admin reply/note on ticket stored in Firestore
+- [x] View full ticket message in a modal
+- [x] Admin reply/note on ticket stored in Firestore
 
 ### Setup Steps (Manual — User Must Do)
 - [x] Go to Firebase Console → Project Settings → Your apps → Add web app → copy `appId`
 - [x] Paste `appId` into `admin-panel/index.html` replacing `"PASTE_YOUR_WEB_APP_ID_HERE"`
-- [ ] Create admin account: Firebase Auth → Add user (e.g. `admin@birdnest.lk` + password)
+- [x] Create admin account: Firebase Auth → Add user (e.g. `admin@birdnest.lk` + password)
 - [ ] Create Firestiore document: `users/{uid}` with `role: "ADMIN"`, `displayName: "Admin"`, `isActive: true`, `email: <email>`, `id: <uid>`, `createdAt: <timestamp>`
 - [ ] Update Firestore security rules to allow `platform_reviews` read/write for authenticated users
 - [ ] Open `admin-panel/index.html` in Chrome/Edge and log in with admin credentials

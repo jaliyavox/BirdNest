@@ -30,22 +30,30 @@ import com.example.boardingbookingapp.ui.theme.*
 @Composable
 fun ProfileScreen(
     onSignOut: () -> Unit,
-    onOpenRentTracker: () -> Unit,
-    onSubmitFeedback: () -> Unit = {},
+    onOpenRentTracker: () -> Unit = {},
+    onPlatformReview: () -> Unit = {},
     onSubmitTicket: () -> Unit = {},
+    onMyListings: () -> Unit = {},
+    onPostListing: () -> Unit = {},
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val user by UserSession.currentUser.collectAsState()
+    val isOwner = user?.role == UserRole.OWNER
 
     val displayName = user?.let {
         it.displayName.ifBlank { "${it.firstName} ${it.lastName}".trim() }
-    } ?: "Student"
+    } ?: if (isOwner) "Owner" else "Student"
     val initial = displayName.firstOrNull()?.uppercase() ?: "?"
     val email = user?.email ?: ""
     val roleLabel = when (user?.role) {
         UserRole.OWNER -> "OWNER"
         UserRole.ADMIN -> "ADMIN"
         else -> "STUDENT"
+    }
+    val badgeColor = when (user?.role) {
+        UserRole.OWNER -> Color(0xFF059669)
+        UserRole.ADMIN -> Color(0xFF7C3AED)
+        else -> ModernPrimary
     }
 
     ModernBackground {
@@ -63,7 +71,7 @@ fun ProfileScreen(
                             modifier = Modifier
                                 .size(96.dp)
                                 .clip(CircleShape)
-                                .background(ModernPrimary),
+                                .background(badgeColor),
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(initial, color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 36.sp)
@@ -74,9 +82,9 @@ fun ProfileScreen(
                         Text(email, color = ModernTextSecondary, fontSize = 14.sp)
                         Spacer(Modifier.height(12.dp))
 
-                        ModernBadge(roleLabel, ModernPrimary)
+                        ModernBadge(roleLabel, badgeColor)
 
-                        if (user?.academicYear != null && user!!.academicYear > 0) {
+                        if (!isOwner && user?.academicYear != null && user!!.academicYear > 0) {
                             Spacer(Modifier.height(12.dp))
                             Text("Year ${user!!.academicYear} · ${user!!.gender.name.lowercase().replaceFirstChar { it.uppercase() }}", color = ModernTextSecondary, fontSize = 13.sp)
                         }
@@ -90,23 +98,38 @@ fun ProfileScreen(
 
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (isOwner) {
+                        ActionItem(
+                            icon  = Icons.Default.Home,
+                            label = "My Listings",
+                            sub   = "View and manage your properties",
+                            onClick = onMyListings,
+                        )
+                        ActionItem(
+                            icon  = Icons.Default.AddHome,
+                            label = "Post a Listing",
+                            sub   = "Add a new property",
+                            onClick = onPostListing,
+                        )
+                    } else {
+                        ActionItem(
+                            icon  = Icons.Default.Groups,
+                            label = "Roommate Preferences",
+                            sub   = "Update criteria",
+                            onClick = {},
+                        )
+                        ActionItem(
+                            icon  = Icons.Default.Payment,
+                            label = "Rent Tracker",
+                            sub   = "Manage payments",
+                            onClick = onOpenRentTracker,
+                        )
+                    }
                     ActionItem(
-                        icon  = Icons.Default.Groups,
-                        label = "Roommate Preferences",
-                        sub   = "Update criteria",
-                        onClick = {},
-                    )
-                    ActionItem(
-                        icon  = Icons.Default.Payment,
-                        label = "Rent Tracker",
-                        sub   = "Manage payments",
-                        onClick = onOpenRentTracker,
-                    )
-                    ActionItem(
-                        icon  = Icons.Default.Feedback,
-                        label = "Submit Feedback",
-                        sub   = "Help us improve BirdNest",
-                        onClick = onSubmitFeedback,
+                        icon  = Icons.Default.Star,
+                        label = "Rate BirdNest",
+                        sub   = "Share your experience",
+                        onClick = onPlatformReview,
                     )
                     ActionItem(
                         icon  = Icons.Default.SupportAgent,

@@ -1,36 +1,21 @@
 package com.example.boardingbookingapp.ui.screens.auth
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.BusinessCenter
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,20 +25,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.boardingbookingapp.ui.components.GlassButton
-import com.example.boardingbookingapp.ui.components.GlassCard
-import com.example.boardingbookingapp.ui.components.GlassOutlineButton
-import com.example.boardingbookingapp.ui.components.GlassTextField
-import com.example.boardingbookingapp.ui.components.GradientBackground
-import com.example.boardingbookingapp.ui.theme.CyanAccent
-import com.example.boardingbookingapp.ui.theme.ErrorRed
-import com.example.boardingbookingapp.ui.theme.TextSecondary
-import com.example.boardingbookingapp.ui.theme.TextTertiary
-import com.example.boardingbookingapp.ui.theme.VioletLight
+import com.example.boardingbookingapp.ui.components.ModernBackground
+import com.example.boardingbookingapp.ui.components.ModernButton
+import com.example.boardingbookingapp.ui.components.ModernCard
+import com.example.boardingbookingapp.ui.components.ModernTextField
+import com.example.boardingbookingapp.ui.theme.*
 
 @Composable
 fun OwnerLoginScreen(
@@ -72,7 +51,7 @@ fun OwnerLoginScreen(
         if (state is AuthState.Authenticated) onLoggedIn()
     }
 
-    GradientBackground {
+    ModernBackground {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -82,64 +61,60 @@ fun OwnerLoginScreen(
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(12.dp))
+
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = ModernTextPrimary)
                 }
+                Spacer(Modifier.width(8.dp))
+                Text("Owner Login", color = ModernTextPrimary, fontSize = 22.sp, fontWeight = FontWeight.Bold)
             }
-
-            Spacer(Modifier.height(24.dp))
-            Icon(
-                imageVector  = Icons.Default.BusinessCenter,
-                contentDescription = null,
-                tint         = CyanAccent,
-                modifier     = Modifier.size(48.dp),
+            Text(
+                "Manage your properties",
+                color    = ModernTextSecondary,
+                fontSize = 14.sp,
+                modifier = Modifier.fillMaxWidth().padding(start = 16.dp),
             )
-            Spacer(Modifier.height(12.dp))
-            Text("Owner Login", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold, letterSpacing = (-0.5).sp)
-            Text("Manage your properties", color = TextSecondary, fontSize = 14.sp, textAlign = TextAlign.Center)
 
-            Spacer(Modifier.height(40.dp))
+            Spacer(Modifier.height(32.dp))
 
-            GlassCard(modifier = Modifier.fillMaxWidth()) {
-                Column {
-                    GlassTextField(
-                        value         = email,
-                        onValueChange = { email = it; viewModel.clearError() },
-                        label         = "EMAIL ADDRESS",
-                        hint          = "owner@example.com",
-                        isError       = state is AuthState.Error,
+            ModernCard(modifier = Modifier.fillMaxWidth()) {
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    ModernTextField(
+                        value           = email,
+                        onValueChange   = { email = it; viewModel.clearError() },
+                        label           = "EMAIL ADDRESS",
+                        placeholder     = "owner@example.com",
+                        isError         = state is AuthState.Error,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                     )
-                    Spacer(Modifier.height(16.dp))
 
-                    GlassTextField(
-                        value         = password,
-                        onValueChange = { password = it; viewModel.clearError() },
-                        label         = "PASSWORD",
-                        hint          = "Enter your password",
-                        isError       = state is AuthState.Error,
-                        errorMessage  = if (state is AuthState.Error) (state as AuthState.Error).message else "",
+                    ModernTextField(
+                        value                = password,
+                        onValueChange        = { password = it; viewModel.clearError() },
+                        label                = "PASSWORD",
+                        placeholder          = "Enter your password",
+                        isError              = state is AuthState.Error,
+                        errorMessage         = if (state is AuthState.Error) (state as AuthState.Error).message else "",
                         visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-                        keyboardActions = KeyboardActions(onDone = {
+                        keyboardOptions      = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                        keyboardActions      = KeyboardActions(onDone = {
                             keyboard?.hide()
                             viewModel.loginOwner(email.trim(), password)
                         }),
-                        trailingIcon  = {
+                        trailingIcon = {
                             IconButton(onClick = { showPassword = !showPassword }) {
                                 Icon(
                                     imageVector = if (showPassword) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                                     contentDescription = null,
-                                    tint = TextSecondary,
+                                    tint = ModernTextSecondary,
                                 )
                             }
                         },
                     )
-                    Spacer(Modifier.height(24.dp))
 
-                    GlassButton(
+                    ModernButton(
                         text      = "Login",
                         onClick   = { keyboard?.hide(); viewModel.loginOwner(email.trim(), password) },
                         isLoading = state is AuthState.Loading,
@@ -148,23 +123,28 @@ fun OwnerLoginScreen(
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(16.dp))
 
-            GlassOutlineButton(
-                text    = "Register as Owner",
-                onClick = onNavigateToRegister,
+            ModernButton(
+                text           = "Register as Owner",
+                onClick        = onNavigateToRegister,
+                containerColor = Color.White,
+                contentColor   = ModernPrimary,
+                modifier       = Modifier
+                    .fillMaxWidth()
+                    .border(1.dp, ModernPrimary.copy(alpha = 0.3f), RoundedCornerShape(16.dp)),
             )
 
             Spacer(Modifier.height(20.dp))
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier              = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment     = Alignment.CenterVertically,
             ) {
-                Text("Are you a student? ", color = TextTertiary, fontSize = 13.sp)
+                Text("Are you a student? ", color = ModernTextSecondary, fontSize = 13.sp)
                 Text(
                     text       = "Student Login",
-                    color      = VioletLight,
+                    color      = ModernPrimary,
                     fontSize   = 13.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier   = Modifier.clickable { onBack() },
